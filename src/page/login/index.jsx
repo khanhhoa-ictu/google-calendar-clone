@@ -1,33 +1,34 @@
-import { Button, Card, Form, Input, message, Row } from 'antd';
-import { login } from '../../service/authentication';
-import logoLogin from '../../assets/login/login-1.svg';
-import Cookies from 'js-cookie';
-import { handleErrorMessage, isValidEmail } from '../../helper';
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router';
-import styles from './styles.module.scss';
+import { Button, Card, Form, Input, message, Row } from "antd";
+import { login } from "../../service/authentication";
+import logoLogin from "../../assets/login/login-1.svg";
+import Cookies from "js-cookie";
+import { handleErrorMessage, isValidEmail } from "../../helper";
+import React, { useEffect } from "react";
+import { NavLink, useNavigate } from "react-router";
+import styles from "./styles.module.scss";
 
 export default function Login() {
   const navigate = useNavigate();
-  const isAuthenticated = !!Cookies.get('token');
-  if (isAuthenticated) return navigate('/');
+  const isAuthenticated = !!Cookies.get("token");
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (payload) => {
     const params = {
       email: payload.email,
-      password: payload.password
-    }
+      password: payload.password,
+    };
 
     try {
       const data = await login(params);
-      const { token, refreshToken } = data;
-      Cookies.set('token', token, {
-        expires: payload.rememberMe ? 10000 : 10000,
-      });
-      Cookies.set('refreshToken', refreshToken, {
-        expires: payload.rememberMe ? 10000 : 10000,
-      });
-      navigate('/');
+      const { token } = data;
+      Cookies.set("token", token);
+
+      navigate("/");
     } catch (error) {
       console.log(error);
       handleErrorMessage(error);
@@ -40,39 +41,58 @@ export default function Login() {
         <div className={styles.formContainer}>
           <Card className={styles.loginForm}>
             <Row justify="center" className={styles.formTitle}>
-            <h3 className='font-bold !text-2xl !lg:text-[32px] uppercase gradient-text'>My Calendar</h3>
+              <h3 className="font-bold !text-2xl !lg:text-[32px] uppercase gradient-text">
+                My Calendar
+              </h3>
             </Row>
             <Form onFinish={handleSubmit} className={styles.formContainerItem}>
               <Form.Item
                 name="email"
                 rules={[
-                 
                   {
                     validator: (_, value) => {
                       if (!isValidEmail(value)) {
-                        return Promise.reject('Email không hợp lệ');
+                        return Promise.reject("Email không hợp lệ");
                       }
-                      return Promise.resolve()
+                      return Promise.resolve();
                     },
                   },
                 ]}
                 wrapperCol={{ span: 24 }}
               >
-                <Input className={styles.customInputLogin} placeholder="Email" maxLength={50} />
+                <Input
+                  className={styles.customInputLogin}
+                  placeholder="Email"
+                  maxLength={50}
+                />
               </Form.Item>
               <Form.Item
                 name="password"
-                rules={[{ required: true, message: 'Password không được để trống' }]}
+                rules={[
+                  { required: true, message: "Password không được để trống" },
+                ]}
                 wrapperCol={{ span: 24 }}
               >
-                <Input.Password className={styles.customInputLogin} placeholder="Mật khẩu" maxLength={50} />
+                <Input.Password
+                  className={styles.customInputLogin}
+                  placeholder="Mật khẩu"
+                  maxLength={50}
+                />
               </Form.Item>
               <Form.Item labelCol={{ span: 24 }}>
-                <Button block type="primary" htmlType="submit" className={styles.btnLogin}>
-                  {'Đăng nhập'}
+                <Button
+                  block
+                  type="primary"
+                  htmlType="submit"
+                  className={styles.btnLogin}
+                >
+                  {"Đăng nhập"}
                 </Button>
               </Form.Item>
-              <Form.Item labelCol={{ span: 24 }} className={styles.forgotPassword}>
+              <Form.Item
+                labelCol={{ span: 24 }}
+                className={styles.forgotPassword}
+              >
                 <NavLink to="/forgot-password">Quên mật khẩu</NavLink>
               </Form.Item>
             </Form>
@@ -81,7 +101,8 @@ export default function Login() {
           <Card className={styles.signUp}>
             <Row justify="center" className={styles.formTitle}>
               <h3>
-                Nếu chưa có tài khoản vui lòng <NavLink to="/register">đăng ký</NavLink>
+                Nếu chưa có tài khoản vui lòng{" "}
+                <NavLink to="/register">đăng ký</NavLink>
               </h3>
             </Row>
           </Card>
