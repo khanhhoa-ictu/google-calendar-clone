@@ -1,0 +1,78 @@
+.forgotContainer {
+    width: 420px;
+    padding: 24px;
+    border-radius: 6px;
+    box-shadow: rgba(190, 190, 190, 0.4) 0px 0px 7px;
+    text-align: center;
+    position: relative;
+
+    :global {
+        .ant-form-item {
+            margin-bottom: 0px;
+        }
+    }
+
+    @media screen and (max-width: 600px) {
+        width: 320px;
+        padding: 12px;
+    }
+
+    h3 {
+        padding: 10px 0;
+        border-bottom: 2px solid rgb(139, 139, 139);
+        margin-bottom: 20px;
+        font-family: 'Literata', serif;
+    }
+
+    .inputCustom {
+        height: 40px;
+        margin-bottom: 12px;
+        border-radius: 4px;
+    }
+
+    .submit {
+        width: 100%;
+        margin-top: 12px;
+        margin-bottom: 80px;
+        padding: 7px 10px;
+        height: 40px;
+        border-radius: 5px;
+    }
+
+    .iconContainer {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+
+        .icon {
+            width: 120px;
+            height: 120px;
+            border: 3px solid #333;
+            border-radius: 50%;
+
+            img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+    }
+
+    .back {
+        background-color: #a8a8a817;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 0;
+        cursor: pointer;
+
+        p {
+            margin: 0;
+        }
+    }
+
+}

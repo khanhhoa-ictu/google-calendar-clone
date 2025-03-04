@@ -1,0 +1,175 @@
+.loginContainer {
+    display: flex;
+    height: 100vh;
+    .wrapperLogin{
+      width:50%;
+  
+      display: flex;
+      align-items: center;
+      .rightDriver{
+        color: rgba(255,247,247,1);
+        z-index: 1;
+        width: 75px;
+        height: 100vh;
+        overflow: hidden;
+        svg{
+          fill: currentColor;
+        }
+        @media screen and (max-width: 600px) {
+          height: 100vh;
+        }
+      }
+      @media screen and (max-width: 1200px) {
+        width: 0%;
+        position: fixed;
+        left: 50%;
+        min-height: 100vh;
+      }
+      @media screen and (max-width: 600px) {
+        min-height: 100vh;
+      }
+    }
+    @media screen and (max-width: 600px) {
+      min-height: 100vh;
+    }
+  }
+  .formContainer{
+    margin: 0 auto;
+  
+    .loginForm {
+      box-shadow: rgba(190, 190, 190,0.4) 0px 0px 7px;
+      border-radius:10px;
+      width: 430px;
+      
+      .forgotPassword{
+        margin-bottom: 0 ;
+        
+      }
+      :global{
+        .ant-card-body{
+          padding: 24px 32px;
+        }
+        
+      }
+      @media screen and (max-width: 500px) {
+        width: 350px;
+        min-width: 350px;
+        max-width: 350px;
+      }
+      @media screen and (max-width: 350px) {
+        width: 300px;
+        min-width: 300px;
+        max-width: 300px;
+      }
+     
+    }
+    .signUp{
+      margin-top: 32px;
+      box-shadow: rgba(190, 190, 190,0.4) 0px 0px 7px;
+      border-radius: 10px;
+  
+      :global{
+        .ant-card-body{
+          padding: 16px 24px 0 24px;
+        }
+      }
+      .formTitle{
+        h3{
+          margin-bottom: 0;
+          font-weight: 400;
+        }
+        @media screen and (max-width: 500px) {
+          h3{
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  
+    @media screen and (max-width: 500px) {
+      .loginForm{
+        :global{
+          .ant-card-body{
+            padding: 12px 16px;
+          }
+        }
+      }
+    
+    
+  }
+  }
+  
+  .formContainer {
+    margin-top: 1rem;
+    :global{
+      .ant-form-item{
+        margin-bottom: 24px;
+      }
+    }
+    @media screen and (max-width: 1200px) {
+      transform: translateX(-50%);
+      margin-top: -3rem;
+    }
+  }
+  .formTitle{
+    padding-bottom: 16px;
+    margin-left: -25px;
+    margin-right: -25px;
+  
+    img{
+      width: 80%;
+      height: 100%;
+      margin-bottom: 20px;
+    }
+  }
+  .customInputLogin {
+    border-radius: 5px;
+    padding: 7px 10px;
+   
+  
+  }
+  .btnLogin {
+    padding: 22px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    margin-top: 1rem;
+    border: none;
+    font-size:16px;
+    margin-bottom: 1.5rem;
+   
+  }
+  .wrapperImage{
+    background-color: #fff7f7;
+    height:100vh;
+    width:50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img{
+      width: 600px;
+      height: 500px;
+     
+    }
+  
+    @media screen and (max-width: 1200px) {
+      width:100%;
+    }
+    @media screen and (max-width: 600px) {
+      height:100vh;
+      img{
+        display: none;
+      }
+    }
+  }
+  .forgotPassword{
+    border-top: 1px solid #b5b5b582;
+    padding-top: 24px;
+    text-align: center;
+  
+    a{
+      color: #333;
+      font-size:14px;
+    }
+  }
