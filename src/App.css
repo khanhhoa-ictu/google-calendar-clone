@@ -73,3 +73,6 @@
     display: none !important;
   }
 }
+.ant-form-item-explain-error {
+  text-align: left;
+}
