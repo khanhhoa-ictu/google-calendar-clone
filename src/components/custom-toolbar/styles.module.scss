@@ -3,7 +3,7 @@
     align-items: center;
     width: 100% !important;
     height: 65px;
-    background-color: #fff;
+    background-color: #f8fafd;
     border-bottom: 1px solid #ececee;
     padding: 0px 10px;
     font-family: "Noto Sans JP";
@@ -25,7 +25,7 @@
   }
 
   .datePickerHeader {
-    background-color: #f8f8fd;
+    // background-color: #f8f8fd;
     border: none;
     border-radius: 4px;
     max-width: 185px;
@@ -70,19 +70,19 @@
     }
   }
   .btnToday {
-    padding: 3px 16px;
-    height: 30px;
-    border: 0.5px solid #f8f8fd;
+    padding: 3px 24px;
+    height: 40px;
+    border: 0.5px solid #0b0bda;
     border-radius: 4px;
-    background-color: #f8f8fd;
+    // background-color: #f8f8fd;
     margin-left: 20px;
     color: #333;
     font-size: 12px;
     font-weight: 700;
   }
   .iconAction {
-    font-size: 11px;
-    font-weight: 300;
+    font-size: 14px;
+    font-weight: 700;
   
     padding-right: 10px;
     cursor: pointer;
