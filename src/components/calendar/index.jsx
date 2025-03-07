@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import moment from "moment";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import events from "../../resources/event";
@@ -9,15 +9,17 @@ import { v4 } from "uuid";
 import ModalCreateCalendar from "../modal/ModalCreateCalendar";
 import viMessages from "../../language/viMessages";
 import CustomToolbar from "../custom-toolbar";
-import styles from './styles.module.scss'
-
+import styles from "./styles.module.scss";
+import { addEvent, getListCalendar, updateEvent } from "../../service/event";
+import { handleErrorMessage } from "../../helper";
+import { STATUS_EVENT } from "../../helper/constants";
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
-function DnDResource() {
-  const [myEventsList, setMyEventsList] = useState(events);
+function DnDResource({ userProfile }) {
+  const [myEventsList, setMyEventsList] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
-
+  const [mode, setMode] = useState(STATUS_EVENT.ADD);
   const { scrollToTime } = useMemo(
     () => ({
       scrollToTime: new Date(1972, 0, 1, 9),
@@ -33,8 +35,8 @@ function DnDResource() {
 
   const handleSelectSlot = async (value) => {
     const defaultTitle = {
-      start: value.start,
-      end: value.end,
+      start_time: value.start,
+      end_time: value.end,
       title: "",
       id: v4(),
     };
@@ -42,43 +44,104 @@ function DnDResource() {
     setMyEventsList([...myEventsList, defaultTitle]);
     setIsOpenModal(true);
   };
-  
-  const handleCreateNewTitle = (value) => {
-    const indexTitle = myEventsList.findIndex((item)=>item.id === selectedSlot.id);
-    if(indexTitle > 0){
+
+  const handleCreateNewEvent = async (title, description, mode) => {
+    const params = {
+      user_id: userProfile.id,
+      title: title,
+      description: description,
+      start_time: moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
+      end_time: moment(selectedSlot.end_time).format("YYYY-MM-DD HH:mm:ss"),
+    };
+
+    let event = null;
+    try {
+      if (mode === STATUS_EVENT.UPDATE) {
+        event = await updateEvent({
+          ...params,
+          id: selectedSlot.id,
+        });
+      } else {
+        event = await addEvent(params);
+      }
+      const indexTitle = myEventsList.findIndex(
+        (item) => item.id === selectedSlot.id
+      );
+
+      if (indexTitle >= 0) {
         const cloneMyEventList = [...myEventsList];
-        cloneMyEventList[indexTitle].title = value;
-        setMyEventsList(cloneMyEventList)
+        cloneMyEventList[indexTitle] = {
+          ...event.data,
+          start_time: new Date(event?.data?.start_time),
+          end_time: new Date(event?.data?.end_time),
+        };
+
+        setMyEventsList(cloneMyEventList);
+      }
+      setSelectedSlot(null);
+      setMode(STATUS_EVENT.ADD);
+      setIsOpenModal(false);
+    } catch (error) {
+      handleErrorMessage(error);
     }
-    setSelectedSlot(null);
-    setIsOpenModal(false);
   };
 
   const handleCloseModal = () => {
-    if (selectedSlot.title === "") {
-      const filterMyEventList = myEventsList.filter(
-        (item) => item.id !== selectedSlot.id
-      );
-      setMyEventsList(filterMyEventList);
-    }
+    handleLoadCalendar();
     setIsOpenModal(false);
     setSelectedSlot(null);
+    setMode(STATUS_EVENT.ADD);
   };
 
+  const handleChangeTime = (value) => {
+    const index = myEventsList.findIndex((item) => item.id === value.id);
+    if (index === -1) {
+      return;
+    }
+    const cloneMyEventList = [...myEventsList];
+    cloneMyEventList[index] = value;
+
+    setSelectedSlot(value);
+    setMyEventsList(cloneMyEventList);
+  };
+
+  const handleViewDetail = (event) => {
+    setSelectedSlot(event);
+    setMode(STATUS_EVENT.UPDATE);
+    setIsOpenModal(true);
+  };
+
+  const handleLoadCalendar = async () => {
+    try {
+      const dataCalendar = await getListCalendar(userProfile?.id);
+      const convertDataCalendar = dataCalendar?.data?.map((item) => ({
+        ...item,
+        start_time: new Date(item.start_time),
+        end_time: new Date(item.end_time),
+      }));
+      setMyEventsList(convertDataCalendar);
+    } catch (error) {
+      handleErrorMessage(error);
+    }
+  };
   
+  useEffect(() => {
+    if (userProfile?.id) {
+      handleLoadCalendar();
+    }
+  }, [userProfile?.id]);
+
   return (
-    <div className="flex-1" >
+    <div className={styles.calendar}>
       <DndProvider backend={HTML5Backend}>
         <DnDCalendar
-          // className="!h-full"
           localizer={localizer}
           events={myEventsList}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: 600 }}
+          startAccessor="start_time"
+          endAccessor="end_time"
           longPressThreshold={500}
           timeslots={4}
-          step={15}
+          step={30}
           onEventDrop={moveEvent}
           resizable={false}
           selectable
@@ -88,25 +151,16 @@ function DnDResource() {
           components={{
             toolbar: CustomToolbar,
           }}
-        //   messages={viMessages} //
-          //   components={{
-          //     event: props?.customEvent
-          //       ? props?.customEvent
-          //       : handleShowCustomEvent,
-          //     toolbar: (
-          //       data: React.PropsWithChildren<ToolbarProps<Event, object>>
-          //     ) => <PageHeader data={data} isSearch={isSearch} />,
-          //     resourceHeader: (
-          //       data: React.PropsWithChildren<ResourceHeaderProps>
-          //     ) => <HeaderCalendar data={data} />,
-          //     timeGutterHeader: (data) => <GutterHeader data={data} />,
-          //   }}
+          onSelectEvent={handleViewDetail}
         />
       </DndProvider>
       <ModalCreateCalendar
         isOpen={isOpenModal}
         onClose={handleCloseModal}
-        onOk={(value) => handleCreateNewTitle(value)}
+        onOk={handleCreateNewEvent}
+        selectedSlot={selectedSlot}
+        handleChangeTime={handleChangeTime}
+        mode={mode}
       />
     </div>
   );

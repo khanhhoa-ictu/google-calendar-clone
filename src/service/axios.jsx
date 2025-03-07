@@ -6,7 +6,6 @@ const axiosInstance = Axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = Cookies.get("token");
