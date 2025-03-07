@@ -2,8 +2,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: calc(100vh - 81px);
-  
+    min-height: 100vh;
+    background-color: white;
     .signUpForm {
       width: 430px;
       margin: 0 auto;
