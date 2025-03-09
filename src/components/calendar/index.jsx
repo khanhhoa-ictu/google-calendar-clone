@@ -20,18 +20,40 @@ function DnDResource({ userProfile }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [mode, setMode] = useState(STATUS_EVENT.ADD);
-  const { scrollToTime } = useMemo(
-    () => ({
-      scrollToTime: new Date(1972, 0, 1, 9),
-    }),
-    []
-  );
-  const moveEvent = useCallback(({ event, start, end }) => {
-    console.log(event);
-    console.log(start);
-    console.log(end);
-    console.log(event?.id);
-  }, []);
+  const [viewMode, setViewMode] = useState("week")
+
+  const moveEvent = async ({ event, start, end }) => {
+    const params = {
+      user_id: userProfile.id,
+      title: event?.title,
+      description: event?.description,
+      start_time: moment(start).format("YYYY-MM-DD HH:mm:ss"),
+      end_time: moment(end).format("YYYY-MM-DD HH:mm:ss"),
+      id: event?.id
+    };
+
+    try {
+      const newEvent = await updateEvent(params);
+      const indexTitle = myEventsList.findIndex(
+        (item) => item.id === event?.id
+      );
+      if (indexTitle >= 0) {
+        const cloneMyEventList = [...myEventsList];
+        cloneMyEventList[indexTitle] = {
+          ...newEvent?.data,
+          start_time: new Date(start),
+          end_time: new Date(end),
+        };
+        setMyEventsList(cloneMyEventList);
+      }
+      setSelectedSlot(null);
+
+    } catch (error) {
+      handleErrorMessage(error)
+    }
+
+
+  };
 
   const handleSelectSlot = async (value) => {
     const defaultTitle = {
@@ -124,7 +146,7 @@ function DnDResource({ userProfile }) {
       handleErrorMessage(error);
     }
   };
-  
+
   useEffect(() => {
     if (userProfile?.id) {
       handleLoadCalendar();
@@ -147,9 +169,9 @@ function DnDResource({ userProfile }) {
           selectable
           showMultiDayTimes={true}
           onSelectSlot={handleSelectSlot}
-          defaultView="week"
+          view={viewMode}
           components={{
-            toolbar: CustomToolbar,
+            toolbar: (props) => <CustomToolbar {...props} setViewMode={setViewMode} viewMode={viewMode} />,
           }}
           onSelectEvent={handleViewDetail}
         />
@@ -161,6 +183,7 @@ function DnDResource({ userProfile }) {
         selectedSlot={selectedSlot}
         handleChangeTime={handleChangeTime}
         mode={mode}
+        view={viewMode}
       />
     </div>
   );

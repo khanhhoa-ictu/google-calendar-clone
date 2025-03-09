@@ -28,7 +28,7 @@ function HomePage() {
   }, []);
 
   return (
-    <div className="flex bg-[#f8fafd] h-full">
+    <div className="flex h-full gap-3">
       <Navbar />
       <DnDResource userProfile={userProfile} />
     </div>
