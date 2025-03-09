@@ -19,7 +19,6 @@ axiosInstance.interceptors.request.use(
 
 const logout = () => {
   Cookies.remove("token");
-  Cookies.remove("refreshToken");
   window.location.href = "/";
 };
 
