@@ -69,9 +69,7 @@
   .ant-picker-input > input {
     color: #333 !important;
   }
-  .ant-picker-clear {
-    display: none !important;
-  }
+  
 }
 .ant-form-item-explain-error {
   text-align: left;

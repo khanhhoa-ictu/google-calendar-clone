@@ -11,9 +11,9 @@ import classNames from "classnames";
 import moment from "moment";
 import dayjs from "dayjs";
 
-function CustomToolbar({ onNavigate, onView, date }) {
+function CustomToolbar({ onNavigate, onView, date, setViewMode, viewMode }) {
   const handleChangeView = (value) => {
-    onView(value);
+    setViewMode(value)
   };
 
   const handlePrevDay = () => {
@@ -29,6 +29,7 @@ function CustomToolbar({ onNavigate, onView, date }) {
   };
 
   const handleChangeDate = (date) => {
+    if(!date) return
     onNavigate("DATE", new Date(date))
   };
 
@@ -89,8 +90,8 @@ function CustomToolbar({ onNavigate, onView, date }) {
       </Space>
 
       <div className="flex gap-2 items-center min-w-[370px] justify-end">
-        <div>
-          <Select onChange={handleChangeView} defaultValue="week">
+        <div  >
+          <Select onChange={handleChangeView} value={viewMode} className="min-w-[100px] !h-[40px]">
             <Select.Option value={"month"}>Tháng</Select.Option>
             <Select.Option value={"week"}>Tuần</Select.Option>
             <Select.Option value={"day"}>Ngày</Select.Option>
