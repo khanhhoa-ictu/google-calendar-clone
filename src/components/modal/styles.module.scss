@@ -60,3 +60,84 @@
         flex: 1;
     }
 }
+
+
+.modalCustom {
+    min-width: 550px !important;
+    :global {
+        .ant-modal-content {
+            border-radius: 10px !important;
+        }
+
+        .ant-modal-header {
+            border-bottom: none !important;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .ant-modal-footer {
+            border-top: none !important;
+            text-align: center !important;
+
+            .ant-btn {
+                width: 130px;
+                margin-left: 20px;
+                border-radius: 4px;
+
+            }
+
+            .ant-btn-primary {
+                background-color: #261797;
+                color: #fff;
+                font-weight: bold;
+                font-size: 12px;
+                :hover{
+                    background-color: #261797 !important;
+                }
+            }
+
+            .ant-btn-default {
+                border: 1px solid #261797;
+                color: #261797;
+                font-weight: bold;
+                font-size: 12px;
+                background-color: white !important;
+            }
+            .ant-btn-default:hover {
+                color: #261797 !important;
+            }
+            .ant-btn-primary:hover {
+                background-color: #261797 !important;
+                color: white !important;
+            }
+            
+        }
+
+        .ant-modal-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .ant-modal-footer .ant-btn+.ant-btn:not(.ant-dropdown-trigger) {
+            margin-left: 20px;
+        }
+
+        .ant-modal-body {
+            text-align: center !important;
+            padding: 10px 24px 30px 24px !important;
+
+            textarea.ant-input {
+                min-height: 250px;
+            }
+
+            .ant-input {
+
+                border-radius: 4px;
+            }
+        }
+    }
+
+    @media screen and (max-width: 560px) {
+        min-width: 350px !important;
+    }
+}
