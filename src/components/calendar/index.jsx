@@ -13,18 +13,20 @@ import styles from "./styles.module.scss";
 import { addEvent, getListCalendar, updateEvent } from "../../service/event";
 import { handleErrorMessage } from "../../helper";
 import { STATUS_EVENT } from "../../helper/constants";
+import useProfile from "../../hook/useProfile";
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
-function DnDResource({ userProfile }) {
+function DnDResource() {
+  const {profile} = useProfile();
   const [myEventsList, setMyEventsList] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [mode, setMode] = useState(STATUS_EVENT.ADD);
   const [viewMode, setViewMode] = useState("week")
-
+  
   const moveEvent = async ({ event, start, end }) => {
     const params = {
-      user_id: userProfile.id,
+      user_id: profile.id,
       title: event?.title,
       description: event?.description,
       start_time: moment(start).format("YYYY-MM-DD HH:mm:ss"),
@@ -69,7 +71,7 @@ function DnDResource({ userProfile }) {
 
   const handleCreateNewEvent = async (title, description, mode) => {
     const params = {
-      user_id: userProfile.id,
+      user_id: profile.id,
       title: title,
       description: description,
       start_time: moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
@@ -135,7 +137,7 @@ function DnDResource({ userProfile }) {
 
   const handleLoadCalendar = async () => {
     try {
-      const dataCalendar = await getListCalendar(userProfile?.id);
+      const dataCalendar = await getListCalendar(profile?.id);
       const convertDataCalendar = dataCalendar?.data?.map((item) => ({
         ...item,
         start_time: new Date(item.start_time),
@@ -148,10 +150,10 @@ function DnDResource({ userProfile }) {
   };
 
   useEffect(() => {
-    if (userProfile?.id) {
+    if (profile?.id) {
       handleLoadCalendar();
     }
-  }, [userProfile?.id]);
+  }, [profile?.id]);
 
   return (
     <div className={styles.calendar}>

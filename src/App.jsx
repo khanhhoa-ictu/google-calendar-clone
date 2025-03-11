@@ -9,6 +9,7 @@ import { ConfigProvider } from "antd";
 import HomePage from "./page/home";
 import LoginPage from "./page/login";
 import Register from "./page/register";
+import Manager from './page/manager'
 import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import ForgotPassWord from "./page/forgot-password";
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassWord />} />
+          <Route path="/manager" element={<Manager />} />
         </Routes>
       </Router>
     </ConfigProvider>

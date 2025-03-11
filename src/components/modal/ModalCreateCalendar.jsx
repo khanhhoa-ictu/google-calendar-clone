@@ -145,7 +145,7 @@ function ModalCreateCalendar({
           />
           {mode === STATUS_EVENT.UPDATE && (
             <Button className={styles.btnDelete} onClick={handleDeleteEvent}>
-              Delete
+              Xoá
             </Button>
           )}
         </div>

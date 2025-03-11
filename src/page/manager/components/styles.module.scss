@@ -1,0 +1,68 @@
+.wrapperModal {
+    :global {
+        .ant-modal {
+            width: 540px !important;
+            border-radius: 6px;
+
+            .ant-modal-content {
+                border-radius: 8px;
+            }
+
+            .ant-modal-header {
+                border-radius: 8px 8px 0 0
+            }
+
+            .ant-modal-body {
+
+                .DraftEditor-editorContainer {
+                    min-height: 400px;
+                }
+
+                .rdw-editor-wrapper {
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                }
+
+                .public-DraftEditor-content {
+                    padding: 0 10px;
+                }
+            }
+            .ant-modal-footer {
+                border-top: none !important;
+    
+                .ant-btn {
+                    width: 130px;
+                    margin-left: 20px;
+                    border-radius: 4px;
+    
+                }
+    
+                .ant-btn-primary {
+                    background-color: #261797;
+                    color: #fff;
+                    font-weight: bold;
+                    font-size: 12px;
+                    :hover{
+                        background-color: #261797 !important;
+                    }
+                }
+    
+                .ant-btn-default {
+                    border: 1px solid #261797;
+                    color: #261797;
+                    font-weight: bold;
+                    font-size: 12px;
+                    background-color: white !important;
+                }
+                .ant-btn-default:hover {
+                    color: #261797 !important;
+                }
+                .ant-btn-primary:hover {
+                    background-color: #261797 !important;
+                    color: white !important;
+                }
+                
+            }
+        }
+    }
+}
