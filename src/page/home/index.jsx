@@ -1,36 +1,24 @@
-import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router";
 import DnDResource from "../../components/calendar";
 import Navbar from "../../components/navbar";
-import { profile } from "../../service/user";
-import { handleErrorMessage } from "../../helper";
-import Cookies from "js-cookie";
-import { useNavigate } from "react-router";
 
 function HomePage() {
   const navigate = useNavigate();
-  const [userProfile, setUserProfile] = useState(null);
   const isAuthenticated = !!Cookies.get("token");
-  const handleLoadProfile = async () => {
-    try {
-      const dataProfile = await profile();
-      setUserProfile(dataProfile);
-    } catch (error) {
-      handleErrorMessage(error);
-    }
-  };
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
-    handleLoadProfile();
   }, []);
 
   return (
     <div className="flex h-full gap-3">
       <Navbar />
-      <DnDResource userProfile={userProfile} />
+      <DnDResource />
     </div>
   );
 }
