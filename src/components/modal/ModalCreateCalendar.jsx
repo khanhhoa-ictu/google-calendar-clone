@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, DatePicker, Input, Modal, TimePicker } from "antd";
+import { Button, DatePicker, Input, Modal, Select, TimePicker } from "antd";
 import styles from "./styles.module.scss";
 import moment from "moment";
 import dayjs from "dayjs";
 import { handleErrorMessage } from "../../helper";
 import { STATUS_EVENT } from "../../helper/constants";
-import { deleteEvent } from "../../service/event";
+import { deleteEvent, deleteRecurringEvent, getDetailEvent } from "../../service/event";
 
 function ModalCreateCalendar({
   isOpen,
@@ -14,18 +14,34 @@ function ModalCreateCalendar({
   selectedSlot,
   handleChangeTime,
   mode,
-  view
+  view,
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [frequency, setFrequency] = useState("none");
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [detailEvent, setDetailEven] = useState(null)
+  const loadDetailEvent = async () => {
+    try {
+      const newEvent = await getDetailEvent(selectedSlot?.recurring_id);
+      setFrequency(newEvent?.data?.frequency);
+      setDetailEven(newEvent?.data)
+    } catch (error) {
+      handleErrorMessage(error);
+    }
+  };
 
   useEffect(() => {
     if (!isOpen) {
       setTitle("");
       setDescription("");
+      setFrequency("none");
     } else {
       setDescription(selectedSlot?.description || "");
       setTitle(selectedSlot?.title || "");
+      if (selectedSlot?.recurring_id) {
+        loadDetailEvent();
+      }
     }
   }, [isOpen]);
 
@@ -38,7 +54,7 @@ function ModalCreateCalendar({
   };
 
   const onChangeEndTime = (time) => {
-    if (!time) return
+    if (!time) return;
     const newDate = moment(selectedSlot?.start_time)
       .startOf("day")
       .add(time?.hour(), "hours")
@@ -56,7 +72,7 @@ function ModalCreateCalendar({
         start_time: new Date(moment(date.toString())),
         end_time: new Date(moment(date.toString()).endOf("day")),
       });
-      return
+      return;
     }
 
     const newStartTime = moment(date.toString())
@@ -75,27 +91,54 @@ function ModalCreateCalendar({
       end_time: new Date(newEndTime),
     });
   };
-
+  
   const handleDeleteEvent = async () => {
+    if (detailEvent?.frequency !== "none") {
+      setIsOpenModal(true);
+      return;
+    }
+    deleteOnlyEvent();
+  };
+
+  const handleChangeRepeat = (value) => {
+    setFrequency(value);
+  };
+
+
+  const deleteOnlyEvent = async () => {
     try {
-      await deleteEvent(selectedSlot?.id)
+      await deleteEvent(selectedSlot?.id);
     } catch (error) {
-      handleErrorMessage(error)
+      handleErrorMessage(error);
     } finally {
-      onClose(false)
+      onClose(false);
+      setIsOpenModal(false)
     }
   };
+
+  const deleteListEvent = async() =>{
+    try {
+      await deleteRecurringEvent(selectedSlot?.recurring_id)
+    } catch (error) {
+      handleErrorMessage(error)
+    }finally {
+      onClose(false);
+      setIsOpenModal(false)
+    }
+  }
 
   return (
     <div>
       <Modal
         title={
           <div className={styles.modalTitle}>
-            {mode === STATUS_EVENT.UPDATE ? 'Cập nhật sự kiện' : 'tạo mới sự kiện'}
+            {mode === STATUS_EVENT.UPDATE
+              ? "Cập nhật sự kiện"
+              : "tạo mới sự kiện"}
           </div>
         }
         open={isOpen}
-        onOk={() => onOk(title, description, mode)}
+        onOk={() => onOk(title, description, frequency, mode)}
         onCancel={() => onClose(false)}
         width={520}
         centered
@@ -107,16 +150,27 @@ function ModalCreateCalendar({
             placeholder="nhập tiêu đề"
             size="large"
           />
+          <Select
+            className="!h-[40px]"
+            value={frequency}
+            onChange={handleChangeRepeat}
+            options={[
+              { value: "none", label: "không lặp" },
+              { value: "daily", label: "lặp lại mỗi ngày" },
+              { value: "weekly", label: "lặp lại mỗi tuần" },
+              { value: "monthly", label: "lặp lại mỗi tháng" },
+            ]}
+          />
+
           <div className={styles.dateTimeContainer}>
             <DatePicker
               onChange={onChangeDate}
               value={dayjs(selectedSlot?.start_time) || null}
               size="large"
               placeholder="Select date"
-
             />
-            {
-              view !== "month" && <div className="flex gap-3" >
+            {view !== "month" && (
+              <div className="flex gap-3">
                 <TimePicker
                   minuteStep={15}
                   format="HH:mm"
@@ -134,8 +188,7 @@ function ModalCreateCalendar({
                   placeholder="Thời gian kết thúc"
                 />
               </div>
-            }
-
+            )}
           </div>
           <Input.TextArea
             placeholder="Nhập mô tả"
@@ -148,6 +201,37 @@ function ModalCreateCalendar({
               Xoá
             </Button>
           )}
+        </div>
+      </Modal>
+
+      <Modal
+        title="Xoá sự kiện"
+        open={isOpenModal}
+        onOk={null}
+        onCancel={() => setIsOpenModal(false)}
+        footer={null}
+        centered
+        className="delete-event-modal"
+      >
+        <div className="!p-6">
+          <p className="!py-6">Bạn có muốn xoá tất cả chuỗi sự kiện này không?</p>
+          <div className="modal-buttons flex justify-between">
+            <Button 
+              onClick={deleteOnlyEvent}
+              className="btn-cancel "
+              size="large"
+            >
+              Chỉ xoá sự kiện này
+            </Button>
+            <Button 
+              onClick={deleteListEvent}
+              type="primary"
+              danger
+              size="large"
+            >
+              Xoá chuỗi sự kiện này
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>

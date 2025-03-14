@@ -56,7 +56,7 @@ function UserItem({ user, deleteUserSuccess, editUserSuccess }) {
         isOpen={isOpenModal.delete}
         handleOk={handleOkDelete}
         handleCancel={() => setIsOpenModal({ ...isOpenModal, delete: false })}
-        title={"Xóa bài viết"}
+        title={"Xóa người dùng"}
         loading={loading}
       >
         Bạn có muốn xóa người dùng này không?
