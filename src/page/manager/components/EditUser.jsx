@@ -45,7 +45,7 @@ function EditUser({ isModalVisible, handleCancel, handleOk, id }) {
   
   return (
     <Modal
-      title="Thêm người dùng"
+      title="Cập nhật người dùng"
       visible={isModalVisible}
       onOk={() => form.submit()}
       onCancel={handleCancelModal}
