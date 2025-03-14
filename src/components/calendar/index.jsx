@@ -10,20 +10,26 @@ import ModalCreateCalendar from "../modal/ModalCreateCalendar";
 import viMessages from "../../language/viMessages";
 import CustomToolbar from "../custom-toolbar";
 import styles from "./styles.module.scss";
-import { addEvent, getListCalendar, updateEvent } from "../../service/event";
+import {
+  addEvent,
+  getListCalendar,
+  updateEvent,
+  updateRecurringEvent,
+} from "../../service/event";
 import { handleErrorMessage } from "../../helper";
 import { STATUS_EVENT } from "../../helper/constants";
 import useProfile from "../../hook/useProfile";
+import { notification } from "antd";
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 function DnDResource() {
-  const {profile} = useProfile();
+  const { profile } = useProfile();
   const [myEventsList, setMyEventsList] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [mode, setMode] = useState(STATUS_EVENT.ADD);
-  const [viewMode, setViewMode] = useState("week")
-  
+  const [viewMode, setViewMode] = useState("week");
+
   const moveEvent = async ({ event, start, end }) => {
     const params = {
       user_id: profile.id,
@@ -31,7 +37,7 @@ function DnDResource() {
       description: event?.description,
       start_time: moment(start).format("YYYY-MM-DD HH:mm:ss"),
       end_time: moment(end).format("YYYY-MM-DD HH:mm:ss"),
-      id: event?.id
+      id: event?.id,
     };
 
     try {
@@ -49,12 +55,9 @@ function DnDResource() {
         setMyEventsList(cloneMyEventList);
       }
       setSelectedSlot(null);
-
     } catch (error) {
-      handleErrorMessage(error)
+      handleErrorMessage(error);
     }
-
-
   };
 
   const handleSelectSlot = async (value) => {
@@ -69,39 +72,31 @@ function DnDResource() {
     setIsOpenModal(true);
   };
 
-  const handleCreateNewEvent = async (title, description, mode) => {
+  const handleCreateNewEvent = async (title, description, frequency, mode) => {
+    if (!title) {
+      notification.error({ message: "vui lòng nhập tiêu đề" });
+      return;
+    }
     const params = {
-      user_id: profile.id,
+      user_id: profile?.id,
       title: title,
       description: description,
       start_time: moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
       end_time: moment(selectedSlot.end_time).format("YYYY-MM-DD HH:mm:ss"),
+      frequency,
     };
 
-    let event = null;
     try {
       if (mode === STATUS_EVENT.UPDATE) {
-        event = await updateEvent({
+        await updateRecurringEvent(selectedSlot?.recurring_id, {
           ...params,
           id: selectedSlot.id,
         });
+      
       } else {
-        event = await addEvent(params);
+        await addEvent(params);
       }
-      const indexTitle = myEventsList.findIndex(
-        (item) => item.id === selectedSlot.id
-      );
-
-      if (indexTitle >= 0) {
-        const cloneMyEventList = [...myEventsList];
-        cloneMyEventList[indexTitle] = {
-          ...event.data,
-          start_time: new Date(event?.data?.start_time),
-          end_time: new Date(event?.data?.end_time),
-        };
-
-        setMyEventsList(cloneMyEventList);
-      }
+      handleLoadCalendar();
       setSelectedSlot(null);
       setMode(STATUS_EVENT.ADD);
       setIsOpenModal(false);
@@ -173,7 +168,13 @@ function DnDResource() {
           onSelectSlot={handleSelectSlot}
           view={viewMode}
           components={{
-            toolbar: (props) => <CustomToolbar {...props} setViewMode={setViewMode} viewMode={viewMode} />,
+            toolbar: (props) => (
+              <CustomToolbar
+                {...props}
+                setViewMode={setViewMode}
+                viewMode={viewMode}
+              />
+            ),
           }}
           onSelectEvent={handleViewDetail}
         />
