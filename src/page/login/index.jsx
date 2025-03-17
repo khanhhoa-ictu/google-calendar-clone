@@ -15,7 +15,7 @@ export default function Login() {
     if (isAuthenticated) {
       navigate("/");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated]);
 
   const handleSubmit = async (payload) => {
     const params = {
@@ -30,7 +30,6 @@ export default function Login() {
 
       navigate("/");
     } catch (error) {
-      console.log(error);
       handleErrorMessage(error);
     }
   };
