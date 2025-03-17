@@ -1,2 +1,6 @@
-git stash list
-git stash apply 0
+git checkout main
+git pull origin main
+git checkout bang
+git merge main
+yarn
+npm run dev
