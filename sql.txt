@@ -1,3 +1,14 @@
+create database calendar;
+USE calendar;
+DROP TABLE user;
+CREATE TABLE user (
+    id int AUTO_INCREMENT PRIMARY KEY,
+    email varchar(255),
+    password varchar(255),
+    token_forgot varchar(255),
+    role int
+);
+
 CREATE TABLE recurring_events (
     id INT PRIMARY KEY AUTO_INCREMENT,
     frequency ENUM('none', 'daily', 'weekly', 'monthly') NOT NULL,
@@ -5,12 +16,15 @@ CREATE TABLE recurring_events (
     until DATETIME DEFAULT NULL 
 );
 
+DROP TABLE event;
 CREATE TABLE event (
+    user_id INT,
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(255),
     description TEXT,
     start_time DATETIME,
     end_time DATETIME,
     recurring_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(id)
 );
