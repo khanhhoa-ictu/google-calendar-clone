@@ -18,12 +18,10 @@ import {
 } from "../../service/event";
 import { handleErrorMessage } from "../../helper";
 import { STATUS_EVENT } from "../../helper/constants";
-import useProfile from "../../hook/useProfile";
 import { notification } from "antd";
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
-function DnDResource() {
-  const { profile } = useProfile();
+function DnDResource({profile}) {
   const [myEventsList, setMyEventsList] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -32,7 +30,7 @@ function DnDResource() {
 
   const moveEvent = async ({ event, start, end }) => {
     const params = {
-      user_id: profile.id,
+      user_id: profile?.id,
       title: event?.title,
       description: event?.description,
       start_time: moment(start).format("YYYY-MM-DD HH:mm:ss"),
@@ -173,6 +171,7 @@ function DnDResource() {
                 {...props}
                 setViewMode={setViewMode}
                 viewMode={viewMode}
+                profile={profile}
               />
             ),
           }}

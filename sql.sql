@@ -20,11 +20,13 @@ DROP TABLE event;
 CREATE TABLE event (
     user_id INT,
     id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
     title VARCHAR(255),
     description TEXT,
     start_time DATETIME,
     end_time DATETIME,
     recurring_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    synced TINYINT(1) DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
