@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react'
 import Navbar from '../../components/navbar'
 import User from './components/User'
-import useProfile from '../../hook/useProfile'
 import { ROLE } from '../../helper/constants';
 import { useNavigate } from 'react-router';
-function Manager() {
-  const {profile} = useProfile();
+function Manager({profile}) {
   const navigate = useNavigate()
 
   useEffect(()=>{

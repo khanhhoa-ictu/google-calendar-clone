@@ -16,7 +16,7 @@ export default function Register() {
     if (isAuthenticated) {
       navigate("/");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated]);
 
   const handleSubmit = async (payload) => {
     setLoading(true);
@@ -57,7 +57,6 @@ export default function Register() {
                 {
                   validator: (_, value) => {
                     if (!isValidEmail(value)) {
-                      console.log("zooo");
                       return Promise.reject("Email không hợp lệ");
                     }
                     return Promise.resolve();

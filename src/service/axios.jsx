@@ -2,7 +2,7 @@ import Axios from 'axios';
 import Cookies from 'js-cookie';
 
 const axiosInstance = Axios.create({
-  timeout: 10000,
+  timeout: 100000,
   baseURL: import.meta.env.VITE_API_URL,
 });
 
@@ -19,40 +19,18 @@ axiosInstance.interceptors.request.use(
 
 const logout = () => {
   Cookies.remove('token');
-  Cookies.remove('refreshToken');
-  window.location.href = "/";
+  window.location.href = "/login";
 };
 
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {  
-    const originalConfig = error.config;
+  async(error) => {  
     if (error.response?.status !== 401) {
       return Promise.reject(error);
-    }
-    const refreshToken = Cookies.get('refreshToken');
-    if (!refreshToken) {
+    }else{
       logout();
       return Promise.reject(error);
     }
-    return Axios.post(`${import.meta.env.VITE_API_URL}/refreshToken`, {
-      refreshToken,
-    })
-      .then((res) => {
-        if (res.status === 200) {
-          const data = res.data.data;
-          Cookies.set('token', data.token);
-          originalConfig.headers.Authorization = `Bearer ${data.token}`;
-          return Axios(originalConfig);
-        } else {
-          logout();
-          return Promise.reject(error);
-        }
-      })
-      .catch(() => {
-        logout();
-        return Promise.reject(error);
-      });
   }
 );
 
