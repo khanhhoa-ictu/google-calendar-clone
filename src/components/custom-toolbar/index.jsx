@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, DatePicker, Select, Space } from "antd"; // Dùng Ant Design cho đẹp (hoặc dùng button thường)
+import { Button, DatePicker, notification, Select, Space } from "antd"; // Dùng Ant Design cho đẹp (hoặc dùng button thường)
 import styles from "./styles.module.scss";
 import iconDatePicker from "../../assets/icon/Date.svg";
 import ArrowRightOutlined from "../../assets/icon/arrow-right.svg";
@@ -9,7 +9,7 @@ import iconNextDay from "../../assets/icon/next-day.svg";
 import { handleErrorMessage } from "../../helper/index";
 import classNames from "classnames";
 import dayjs from "dayjs";
-import { checkSyncToGoogle } from "../../service/event";
+import { checkSyncToGoogle, syncGoogleCalendar } from "../../service/event";
 
 function CustomToolbar({
   onNavigate,
@@ -18,8 +18,12 @@ function CustomToolbar({
   setViewMode,
   viewMode,
   profile,
+  myEventsList,
+  handleLoadCalendar,
 }) {
   const [isSync, setIsSync] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const handleChangeView = (value) => {
     setViewMode(value);
   };
@@ -42,9 +46,27 @@ function CustomToolbar({
   };
 
   const handleSyncToGoogleCalendar = async () => {
+    setLoading(true);
+    const accessToken = localStorage.getItem("accessToken");
+
     try {
-      window.location.href = "http://localhost:8080/google/auth";
+      if (accessToken) {
+        await syncGoogleCalendar({
+          userId: profile?.id,
+          accessToken: accessToken,
+        });
+        setTimeout(() => {
+          handleCheckSync();
+          notification.success({
+            message: "đồng bộ lên google calendar thành công",
+          });
+          setLoading(false);
+        }, 2000);
+      } else {
+        window.location.href = `http://localhost:8080/google/auth/${profile?.id}`;
+      }
     } catch (error) {
+      setLoading(false);
       handleErrorMessage(error);
     }
   };
@@ -58,10 +80,10 @@ function CustomToolbar({
   };
 
   useEffect(() => {
-    if(profile?.id){
+    if (profile?.id) {
       handleCheckSync();
     }
-  }, [profile?.id]);
+  }, [profile?.id, myEventsList]);
 
   return (
     <div className={styles.headerWrapper}>
@@ -120,15 +142,14 @@ function CustomToolbar({
       </Space>
 
       <div className="flex gap-2 items-center min-w-[370px] justify-end">
-        {isSync ? (
-          <Button className="!h-[40px]" onClick={handleSyncToGoogleCalendar}>
-            Đồng bộ lên google calendar
-          </Button>
-        ) : (
-          <Button className="!h-[40px]">
-           Đã đồng bộ lên google calendar
-          </Button>
-        )}
+        <Button
+          disabled={!isSync}
+          loading={loading}
+          className="!h-[40px]"
+          onClick={handleSyncToGoogleCalendar}
+        >
+          Đồng bộ lên google calendar
+        </Button>
 
         <div>
           <Select
