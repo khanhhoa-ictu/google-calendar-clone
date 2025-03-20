@@ -106,8 +106,9 @@ function ModalCreateCalendar({
 
 
   const deleteOnlyEvent = async () => {
+    const accessToken = localStorage.getItem("accessToken");
     try {
-      await deleteEvent(selectedSlot?.id);
+      await deleteEvent({eventId:selectedSlot?.id, accessToken});
     } catch (error) {
       handleErrorMessage(error);
     } finally {
@@ -117,8 +118,9 @@ function ModalCreateCalendar({
   };
 
   const deleteListEvent = async() =>{
+    const accessToken = localStorage.getItem("accessToken");
     try {
-      await deleteRecurringEvent(selectedSlot?.recurring_id)
+      await deleteRecurringEvent({eventId:selectedSlot?.id, accessToken})
     } catch (error) {
       handleErrorMessage(error)
     }finally {

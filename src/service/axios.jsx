@@ -19,7 +19,7 @@ axiosInstance.interceptors.request.use(
 
 const logout = () => {
   Cookies.remove('token');
-  window.location.href = "/login";
+  localStorage.clear()
 };
 
 axiosInstance.interceptors.response.use(

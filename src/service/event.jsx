@@ -6,11 +6,11 @@ export const getListCalendar = (userId) =>sendGet(`/event/${userId}`)
 
 export const updateEvent = (params) => sendPut(`/event/update-event`, params)
 
-export const deleteEvent = (eventId) => sendDelete(`/event/delete-event/${eventId}`)
+export const deleteEvent = (params) => sendDelete(`/event/delete-event/${params?.eventId}/${params?.accessToken}`)
 
 export const getDetailEvent = (id) =>sendGet(`/recurring-events/${id}`)
 
-export const deleteRecurringEvent = (eventId) => sendDelete(`/recurring-events/${eventId}`)
+export const deleteRecurringEvent = (params) => sendDelete(`/recurring-events/${params?.eventId}/${params?.accessToken}`)
 
 export const updateRecurringEvent = (eventId, params) => sendPut(`/recurring-events/${eventId}`, params)
 

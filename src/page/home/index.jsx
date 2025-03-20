@@ -19,19 +19,15 @@ function HomePage({ profile }) {
     setLoading(true);
     try {
       let accessToken = localStorage.getItem("accessToken");
-      let refreshToken = localStorage.getItem("refreshToken");
       if (!accessToken) {
         const data = await getTokenByGoogleCalendar(code);
         localStorage.setItem("accessToken", data.access_token);
-        localStorage.setItem("refreshToken", data.refresh_token);
         accessToken = localStorage.getItem("accessToken");
-        refreshToken = localStorage.getItem("refreshToken");
       }
 
       await syncGoogleCalendar({
         userId: profile?.id,
         accessToken: accessToken,
-        refreshToken: refreshToken,
       });
       notification.success({message: "đồng bộ lên google calendar thành công"})
       navigate("/");

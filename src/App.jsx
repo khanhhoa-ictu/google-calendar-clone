@@ -16,7 +16,7 @@ import useProfile from "./hook/useProfile";
 
 moment.locale("vi");
 function App() {
-  const {profile} = useProfile()
+  const {profile} = useProfile();
   return (
     <ConfigProvider locale={vi_VN}>
       <Router>

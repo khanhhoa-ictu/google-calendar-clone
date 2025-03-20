@@ -13,7 +13,9 @@ CREATE TABLE event (
     start_time DATETIME,
     end_time DATETIME,
     recurring_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     synced TINYINT(1) DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    google_event_id VARCHAR(255) DEFAULT NULL,
+    google_email VARCHAR(255) UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );

@@ -86,9 +86,11 @@ function DnDResource({profile}) {
 
     try {
       if (mode === STATUS_EVENT.UPDATE) {
+        const accessToken = localStorage.getItem("accessToken");
         await updateRecurringEvent(selectedSlot?.recurring_id, {
           ...params,
           id: selectedSlot.id,
+          accessToken,
         });
       
       } else {
@@ -172,6 +174,8 @@ function DnDResource({profile}) {
                 setViewMode={setViewMode}
                 viewMode={viewMode}
                 profile={profile}
+                myEventsList={myEventsList}
+                handleLoadCalendar={()=>handleLoadCalendar()}
               />
             ),
           }}
