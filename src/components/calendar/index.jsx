@@ -12,47 +12,49 @@ import CustomToolbar from "../custom-toolbar";
 import styles from "./styles.module.scss";
 import {
   addEvent,
+  getDetailEvent,
   getListCalendar,
   updateEvent,
   updateRecurringEvent,
 } from "../../service/event";
 import { handleErrorMessage } from "../../helper";
 import { STATUS_EVENT } from "../../helper/constants";
-import { notification } from "antd";
+import { Button, Modal, notification } from "antd";
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
-function DnDResource({profile}) {
+function DnDResource({ profile }) {
   const [myEventsList, setMyEventsList] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [mode, setMode] = useState(STATUS_EVENT.ADD);
   const [viewMode, setViewMode] = useState("week");
+  const [pramsMoveEvent, setParamsMoveEvent] = useState(null);
+  const [modalConfirmMove, setModalConfirmMove] = useState(false);
 
   const moveEvent = async ({ event, start, end }) => {
-    const params = {
-      user_id: profile?.id,
-      title: event?.title,
-      description: event?.description,
-      start_time: moment(start).format("YYYY-MM-DD HH:mm:ss"),
-      end_time: moment(end).format("YYYY-MM-DD HH:mm:ss"),
-      id: event?.id,
-    };
-
+    const accessToken = localStorage.getItem("accessToken");
+   
     try {
-      const newEvent = await updateEvent(params);
-      const indexTitle = myEventsList.findIndex(
-        (item) => item.id === event?.id
-      );
-      if (indexTitle >= 0) {
-        const cloneMyEventList = [...myEventsList];
-        cloneMyEventList[indexTitle] = {
-          ...newEvent?.data,
-          start_time: new Date(start),
-          end_time: new Date(end),
-        };
-        setMyEventsList(cloneMyEventList);
+      const newEvent = await getDetailEvent(event?.recurring_id);
+      const params = {
+        user_id: profile?.id,
+        title: event?.title,
+        description: event?.description,
+        start_time: moment(start).format("YYYY-MM-DD HH:mm:ss"),
+        end_time: moment(end).format("YYYY-MM-DD HH:mm:ss"),
+        id: event?.id,
+        accessToken,
+        
+        recurring_id: event?.recurring_id,
+        frequency : newEvent?.data?.frequency
+      };
+      setParamsMoveEvent(params);
+      if (newEvent?.data?.frequency === "none") {
+        await updateEvent(params);
+        handleLoadCalendar();
+      } else {
+        setModalConfirmMove(true);
       }
-      setSelectedSlot(null);
     } catch (error) {
       handleErrorMessage(error);
     }
@@ -70,11 +72,19 @@ function DnDResource({profile}) {
     setIsOpenModal(true);
   };
 
-  const handleCreateNewEvent = async (title, description, frequency, mode) => {
+  const handleCreateNewEvent = async (
+    title,
+    description,
+    frequency,
+    mode,
+    oldFrequency = ""
+  ) => {
     if (!title) {
       notification.error({ message: "vui lòng nhập tiêu đề" });
       return;
     }
+    const accessToken = localStorage.getItem("accessToken");
+
     const params = {
       user_id: profile?.id,
       title: title,
@@ -82,17 +92,19 @@ function DnDResource({profile}) {
       start_time: moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
       end_time: moment(selectedSlot.end_time).format("YYYY-MM-DD HH:mm:ss"),
       frequency,
+      accessToken,
     };
 
     try {
       if (mode === STATUS_EVENT.UPDATE) {
-        const accessToken = localStorage.getItem("accessToken");
-        await updateRecurringEvent(selectedSlot?.recurring_id, {
-          ...params,
-          id: selectedSlot.id,
-          accessToken,
-        });
-      
+        if (oldFrequency) {
+          await updateEvent({ ...params, id: selectedSlot.id });
+        } else {
+          await updateRecurringEvent(selectedSlot?.recurring_id, {
+            ...params,
+            id: selectedSlot.id,
+          });
+        }
       } else {
         await addEvent(params);
       }
@@ -144,6 +156,28 @@ function DnDResource({profile}) {
     }
   };
 
+  const handleConfirmOnly = async () => {
+    try {
+      await updateEvent(pramsMoveEvent);
+      handleLoadCalendar()
+    } catch (error) {
+      handleErrorMessage(error);
+    }finally{
+      setModalConfirmMove(false)
+    }
+  };
+
+  const handleConFirmList = async () => {
+    try {
+      await updateRecurringEvent(pramsMoveEvent.recurring_id, pramsMoveEvent);
+      handleLoadCalendar()
+    } catch (error) {
+      handleErrorMessage(error)
+    }finally{
+      setModalConfirmMove(false)
+    }
+  };
+
   useEffect(() => {
     if (profile?.id) {
       handleLoadCalendar();
@@ -175,7 +209,7 @@ function DnDResource({profile}) {
                 viewMode={viewMode}
                 profile={profile}
                 myEventsList={myEventsList}
-                handleLoadCalendar={()=>handleLoadCalendar()}
+                handleLoadCalendar={() => handleLoadCalendar()}
               />
             ),
           }}
@@ -191,6 +225,38 @@ function DnDResource({profile}) {
         mode={mode}
         view={viewMode}
       />
+
+      <Modal
+        title="Cập nhật sự kiện"
+        open={modalConfirmMove}
+        onOk={null}
+        onCancel={() => setModalConfirmMove(false)}
+        footer={null}
+        centered
+        className="delete-event-modal"
+      >
+        <div className="!p-6">
+          <p className="!py-6">
+            Bạn có muốn cập nhật tất cả chuỗi sự kiện này không?
+          </p>
+          <div className="modal-buttons flex justify-between">
+            <Button
+              onClick={() => handleConfirmOnly()}
+              className="btn-cancel"
+              size="large"
+            >
+              Cập nhật sự kiện này
+            </Button>
+            <Button
+              onClick={() => handleConFirmList()}
+              type="primary"
+              size="large"
+            >
+              Cập nhật chuỗi sự kiện
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

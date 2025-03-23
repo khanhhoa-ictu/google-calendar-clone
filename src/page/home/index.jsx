@@ -20,7 +20,10 @@ function HomePage({ profile }) {
     try {
       let accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
-        const data = await getTokenByGoogleCalendar(code);
+        const data = await getTokenByGoogleCalendar({
+          code,
+          userId: profile?.id,
+        });
         localStorage.setItem("accessToken", data.access_token);
         accessToken = localStorage.getItem("accessToken");
       }
@@ -29,7 +32,9 @@ function HomePage({ profile }) {
         userId: profile?.id,
         accessToken: accessToken,
       });
-      notification.success({message: "đồng bộ lên google calendar thành công"})
+      notification.success({
+        message: "đồng bộ lên google calendar thành công",
+      });
       navigate("/");
     } catch (error) {
       handleErrorMessage(error);

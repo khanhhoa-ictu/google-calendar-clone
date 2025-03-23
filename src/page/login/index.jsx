@@ -6,11 +6,12 @@ import { handleErrorMessage, isValidEmail } from "../../helper";
 import React, { useEffect } from "react";
 import { NavLink, useNavigate } from "react-router";
 import styles from "./styles.module.scss";
+import { useProfile } from "../../context/ProfileContext";
 
 export default function Login() {
   const navigate = useNavigate();
   const isAuthenticated = !!Cookies.get("token");
-
+  const { refreshProfile } = useProfile();
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/");
@@ -27,7 +28,7 @@ export default function Login() {
       const data = await login(params);
       const { token } = data;
       Cookies.set("token", token);
-
+      refreshProfile()
       navigate("/");
     } catch (error) {
       handleErrorMessage(error);
