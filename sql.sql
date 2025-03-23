@@ -6,6 +6,7 @@ CREATE TABLE user (
     email varchar(255),
     password varchar(255),
     token_forgot varchar(255),
+    google_email VARCHAR(255) UNIQUE,
     role int
 );
 
@@ -29,6 +30,5 @@ CREATE TABLE event (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     synced TINYINT(1) DEFAULT 0,
     google_event_id VARCHAR(255) DEFAULT NULL,
-    google_email VARCHAR(255) UNIQUE,
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
