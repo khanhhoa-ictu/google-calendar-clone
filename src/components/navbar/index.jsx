@@ -2,8 +2,8 @@ import React from "react";
 import { Link, useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { Button } from "antd";
-import useProfile from "../../hook/useProfile";
 import { ROLE } from "../../helper/constants";
+import { useProfile } from "../../context/ProfileContext";
 
 function Navbar() {
   const { profile } = useProfile();

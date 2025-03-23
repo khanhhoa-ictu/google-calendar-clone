@@ -5,7 +5,11 @@ import moment from "moment";
 import dayjs from "dayjs";
 import { handleErrorMessage } from "../../helper";
 import { STATUS_EVENT } from "../../helper/constants";
-import { deleteEvent, deleteRecurringEvent, getDetailEvent } from "../../service/event";
+import {
+  deleteEvent,
+  deleteRecurringEvent,
+  getDetailEvent,
+} from "../../service/event";
 
 function ModalCreateCalendar({
   isOpen,
@@ -20,12 +24,14 @@ function ModalCreateCalendar({
   const [description, setDescription] = useState("");
   const [frequency, setFrequency] = useState("none");
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [detailEvent, setDetailEven] = useState(null)
+  const [isOpenModalUpdate, setIsOpenModalUpdate] = useState(false);
+  const [detailEvent, setDetailEven] = useState(null);
+  
   const loadDetailEvent = async () => {
     try {
       const newEvent = await getDetailEvent(selectedSlot?.recurring_id);
       setFrequency(newEvent?.data?.frequency);
-      setDetailEven(newEvent?.data)
+      setDetailEven(newEvent?.data);
     } catch (error) {
       handleErrorMessage(error);
     }
@@ -36,6 +42,7 @@ function ModalCreateCalendar({
       setTitle("");
       setDescription("");
       setFrequency("none");
+      setDetailEven(null);
     } else {
       setDescription(selectedSlot?.description || "");
       setTitle(selectedSlot?.title || "");
@@ -91,7 +98,7 @@ function ModalCreateCalendar({
       end_time: new Date(newEndTime),
     });
   };
-  
+
   const handleDeleteEvent = async () => {
     if (detailEvent?.frequency !== "none") {
       setIsOpenModal(true);
@@ -100,34 +107,41 @@ function ModalCreateCalendar({
     deleteOnlyEvent();
   };
 
+  const handleUpdateEvent = async () => {
+    if (detailEvent?.frequency && detailEvent?.frequency !== "none") {
+      setIsOpenModalUpdate(true);
+      return;
+    }
+    onOk(title, description, frequency, mode);
+  };
+
   const handleChangeRepeat = (value) => {
     setFrequency(value);
   };
 
-
   const deleteOnlyEvent = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await deleteEvent({eventId:selectedSlot?.id, accessToken});
+      await deleteEvent({ eventId: selectedSlot?.id, accessToken });
     } catch (error) {
       handleErrorMessage(error);
     } finally {
       onClose(false);
-      setIsOpenModal(false)
+      setIsOpenModal(false);
     }
   };
 
-  const deleteListEvent = async() =>{
+  const deleteListEvent = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
-      await deleteRecurringEvent({eventId:selectedSlot?.id, accessToken})
+      await deleteRecurringEvent({ eventId: selectedSlot?.id, accessToken });
     } catch (error) {
-      handleErrorMessage(error)
-    }finally {
+      handleErrorMessage(error);
+    } finally {
       onClose(false);
-      setIsOpenModal(false)
+      setIsOpenModal(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -140,7 +154,7 @@ function ModalCreateCalendar({
           </div>
         }
         open={isOpen}
-        onOk={() => onOk(title, description, frequency, mode)}
+        onOk={() => handleUpdateEvent()}
         onCancel={() => onClose(false)}
         width={520}
         centered
@@ -216,22 +230,68 @@ function ModalCreateCalendar({
         className="delete-event-modal"
       >
         <div className="!p-6">
-          <p className="!py-6">Bạn có muốn xoá tất cả chuỗi sự kiện này không?</p>
+          <p className="!py-6">
+            Bạn có muốn xoá tất cả chuỗi sự kiện này không?
+          </p>
           <div className="modal-buttons flex justify-between">
-            <Button 
+            <Button
               onClick={deleteOnlyEvent}
               className="btn-cancel "
               size="large"
             >
               Chỉ xoá sự kiện này
             </Button>
-            <Button 
+            <Button
               onClick={deleteListEvent}
               type="primary"
               danger
               size="large"
             >
               Xoá chuỗi sự kiện này
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        title="Cập nhật sự kiện"
+        open={isOpenModalUpdate}
+        onOk={null}
+        onCancel={() => setIsOpenModalUpdate(false)}
+        footer={null}
+        centered
+        className="delete-event-modal"
+      >
+        <div className="!p-6">
+          <p className="!py-6">
+            Bạn có muốn cập nhật tất cả chuỗi sự kiện này không?
+          </p>
+          <div className="modal-buttons flex justify-between">
+            <Button
+              onClick={() => {
+                onOk(
+                  title,
+                  description,
+                  frequency,
+                  mode,
+                  detailEvent?.frequency
+                );
+                setIsOpenModalUpdate(false);
+              }}
+              className="btn-cancel"
+              size="large"
+            >
+              Cập nhật sự kiện này
+            </Button>
+            <Button
+              onClick={() => {
+                onOk(title, description, frequency, mode);
+                setIsOpenModalUpdate(false);
+              }}
+              type="primary"
+              size="large"
+            >
+              Cập nhật chuỗi sự kiện
             </Button>
           </div>
         </div>

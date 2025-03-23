@@ -1,3 +1,13 @@
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    token_forgot VARCHAR(255) DEFAULT NULL,
+    role ENUM(1, 2) DEFAULT 2,
+    refresh_token_google TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)
 CREATE TABLE recurring_events (
     id INT PRIMARY KEY AUTO_INCREMENT,
     frequency ENUM('none', 'daily', 'weekly', 'monthly') NOT NULL,
