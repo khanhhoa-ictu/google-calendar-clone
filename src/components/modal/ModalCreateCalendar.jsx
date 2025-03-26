@@ -108,11 +108,19 @@ function ModalCreateCalendar({
   };
 
   const handleUpdateEvent = async () => {
-    if (detailEvent?.frequency && detailEvent?.frequency !== "none") {
+    if (detailEvent?.frequency && detailEvent?.frequency !== "none" && frequency !== 'none') {
       setIsOpenModalUpdate(true);
       return;
     }
-    onOk(title, description, frequency, mode);
+    if (detailEvent?.frequency && detailEvent?.frequency !== "none" && frequency === 'none') {
+      onOk(title, description, frequency, mode);
+      return;
+    }
+    if (detailEvent?.frequency && detailEvent?.frequency === "none" && frequency !== 'none') {
+      onOk(title, description, frequency, mode);
+      return;
+    }
+    onOk(title, description, frequency, mode, detailEvent?.frequency);
   };
 
   const handleChangeRepeat = (value) => {

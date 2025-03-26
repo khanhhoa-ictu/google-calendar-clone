@@ -5,6 +5,7 @@ import DnDResource from "../../components/calendar";
 import Navbar from "../../components/navbar";
 import {
   getTokenByGoogleCalendar,
+  registerWebhook,
   syncGoogleCalendar,
 } from "../../service/event";
 import { message, notification } from "antd";
@@ -48,6 +49,10 @@ function HomePage({ profile }) {
       navigate("/login");
       return;
     }
+    // let accessToken = localStorage.getItem("accessToken");
+    // if (accessToken !== 'undefined') {
+    //   registerWebhook(accessToken);
+    // }
   }, []);
 
   useEffect(() => {
