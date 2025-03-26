@@ -22,7 +22,6 @@ CREATE TABLE recurring_events (
 
 DROP TABLE event;
 CREATE TABLE event (
-    user_id INT,
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     title VARCHAR(255),
