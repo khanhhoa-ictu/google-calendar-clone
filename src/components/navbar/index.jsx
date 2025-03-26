@@ -9,6 +9,7 @@ function Navbar() {
   const { profile } = useProfile();
   const navigate = useNavigate();
   const handleLogout = () => {
+    localStorage.clear()
     Cookies.remove("token");
     navigate("/login");
   };

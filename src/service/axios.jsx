@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 const axiosInstance = Axios.create({
   timeout: 100000,
   baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(
@@ -12,6 +13,11 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    config.headers["ngrok-skip-browser-warning"] = "any";
+    config.headers["Access-Control-Allow-Origin"] = "*";
+    config.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
+    config.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization";
+    config.headers["Content-Type"] = "application/json";
     return config;
   },
   (error) => Promise.reject(error)
