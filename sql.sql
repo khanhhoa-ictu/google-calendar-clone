@@ -1,9 +1,13 @@
+create database calendar;
+USE calendar;
+
+DROP TABLE user;
 CREATE TABLE user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     token_forgot VARCHAR(255) DEFAULT NULL,
-    role ENUM(1, 2) DEFAULT 2,
+    role ENUM('1', '2') DEFAULT '2',
     refresh_token_google TEXT,
     google_email VARCHAR(255) UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
