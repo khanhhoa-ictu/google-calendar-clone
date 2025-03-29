@@ -1,9 +1,13 @@
+create database calendar;
+USE calendar;
+
+DROP TABLE user;
 CREATE TABLE user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     token_forgot VARCHAR(255) DEFAULT NULL,
-    role ENUM(1, 2) DEFAULT 2,
+    role ENUM('1', '2') DEFAULT '2',
     refresh_token_google TEXT,
     access_token_google TEXT,
     google_email varchar(255) DEFAULT NULL UNIQUE,
@@ -19,7 +23,6 @@ CREATE TABLE recurring_events (
 
 DROP TABLE event;
 CREATE TABLE event (
-    user_id INT,
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     title VARCHAR(255),
