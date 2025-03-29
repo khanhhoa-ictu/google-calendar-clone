@@ -5,6 +5,7 @@ CREATE TABLE user (
     token_forgot VARCHAR(255) DEFAULT NULL,
     role ENUM(1, 2) DEFAULT 2,
     refresh_token_google TEXT,
+    access_token_google TEXT,
     google_email varchar(255) DEFAULT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
