@@ -5,6 +5,7 @@ import DnDResource from "../../components/calendar";
 import Navbar from "../../components/navbar";
 import {
   getTokenByGoogleCalendar,
+  registerWebhook,
   syncGoogleCalendar,
 } from "../../service/event";
 import { message, notification } from "antd";
@@ -24,7 +25,9 @@ function HomePage({ profile }) {
           code,
           userId: profile?.id,
         });
-        localStorage.setItem("accessToken", data.access_token);
+        if(data?.access_token){
+          localStorage.setItem("accessToken", data.access_token);
+        }
         accessToken = localStorage.getItem("accessToken");
       }
 
@@ -55,6 +58,10 @@ function HomePage({ profile }) {
     const code = urlParams.get("code");
     if (code && profile) {
       handleGetTokenByGoogle(code);
+    }
+    let accessToken = localStorage.getItem("accessToken");
+    if (accessToken && profile) {
+      registerWebhook(accessToken, profile?.email);
     }
   }, [profile]);
 

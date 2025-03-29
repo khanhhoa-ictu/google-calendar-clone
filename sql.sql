@@ -5,7 +5,7 @@ CREATE TABLE user (
     token_forgot VARCHAR(255) DEFAULT NULL,
     role ENUM(1, 2) DEFAULT 2,
     refresh_token_google TEXT,
-    google_email VARCHAR(255) UNIQUE,
+    google_email varchar(255) DEFAULT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )
@@ -29,5 +29,16 @@ CREATE TABLE event (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     synced TINYINT(1) DEFAULT 0,
     google_event_id VARCHAR(255) DEFAULT NULL,
+    instance_id varchar(255) DEFAULT NULL,
+    last_resource_id varchar(255) DEFAULT NULL,
+    UNIQUE KEY unique_last_resource_id (last_resource_id),
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE event_attendees (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    event_id INT NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    response_status ENUM('needsAction', 'declined', 'tentative', 'accepted') DEFAULT 'needsAction',
+    FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE
 );

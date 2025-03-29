@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 const axiosInstance = Axios.create({
   timeout: 100000,
   baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(
@@ -12,6 +13,7 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    config.headers["ngrok-skip-browser-warning"] = "any";
     return config;
   },
   (error) => Promise.reject(error)
