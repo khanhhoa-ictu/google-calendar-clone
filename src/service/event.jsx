@@ -22,7 +22,7 @@ export const checkSyncToGoogle = (userId) =>sendGet(`/google/sync-calendar/check
 
 export const handleRefreshTokenGoogle = (userId) =>sendGet(`/google/auth/refresh-token/${userId}`)
 
-export const registerWebhook = (accessToken) =>sendPost("/google/register-webhook",{accessToken})
+export const registerWebhook = (accessToken, email) =>sendPost("/google/register-webhook",{accessToken, email})
 
 
 

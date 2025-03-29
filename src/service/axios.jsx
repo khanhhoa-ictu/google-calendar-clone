@@ -14,10 +14,6 @@ axiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     config.headers["ngrok-skip-browser-warning"] = "any";
-    config.headers["Access-Control-Allow-Origin"] = "*";
-    config.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
-    config.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization";
-    config.headers["Content-Type"] = "application/json";
     return config;
   },
   (error) => Promise.reject(error)

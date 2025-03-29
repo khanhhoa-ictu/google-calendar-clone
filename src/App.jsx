@@ -23,7 +23,9 @@ function App() {
   const handleRefresh = async () => {
     try {
       const res = await handleRefreshTokenGoogle(profile?.id);
-      localStorage.setItem("accessToken", res.accessToken);
+      if(res?.accessToken){
+        localStorage.setItem("accessToken", res.accessToken);
+      }
     } catch (error) {
       console.error("Lỗi làm mới token:", error);
     }

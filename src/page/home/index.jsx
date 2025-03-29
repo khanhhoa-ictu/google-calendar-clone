@@ -25,7 +25,9 @@ function HomePage({ profile }) {
           code,
           userId: profile?.id,
         });
-        localStorage.setItem("accessToken", data.access_token);
+        if(data?.access_token){
+          localStorage.setItem("accessToken", data.access_token);
+        }
         accessToken = localStorage.getItem("accessToken");
       }
 
@@ -49,10 +51,6 @@ function HomePage({ profile }) {
       navigate("/login");
       return;
     }
-    // let accessToken = localStorage.getItem("accessToken");
-    // if (accessToken !== 'undefined') {
-    //   registerWebhook(accessToken);
-    // }
   }, []);
 
   useEffect(() => {
@@ -60,6 +58,10 @@ function HomePage({ profile }) {
     const code = urlParams.get("code");
     if (code && profile) {
       handleGetTokenByGoogle(code);
+    }
+    let accessToken = localStorage.getItem("accessToken");
+    if (accessToken && profile) {
+      registerWebhook(accessToken, profile?.email);
     }
   }, [profile]);
 
