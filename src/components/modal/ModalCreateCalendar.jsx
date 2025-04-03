@@ -1,15 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Button, DatePicker, Input, Modal, Select, TimePicker } from "antd";
+import {
+  Button,
+  DatePicker,
+  Input,
+  Modal,
+  Select,
+  Space,
+  TimePicker,
+} from "antd";
 import styles from "./styles.module.scss";
 import moment from "moment";
 import dayjs from "dayjs";
 import { handleErrorMessage } from "../../helper";
 import { STATUS_EVENT } from "../../helper/constants";
 import {
+  checkSyncToGoogle,
   deleteEvent,
   deleteRecurringEvent,
   getDetailEvent,
 } from "../../service/event";
+import { useProfile } from "../../context/ProfileContext";
+import { getListEmail } from "../../service/user";
 
 function ModalCreateCalendar({
   isOpen,
@@ -20,16 +31,21 @@ function ModalCreateCalendar({
   mode,
   view,
 }) {
+  const { profile } = useProfile();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [frequency, setFrequency] = useState("none");
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModalUpdate, setIsOpenModalUpdate] = useState(false);
   const [detailEvent, setDetailEven] = useState(null);
-  
+  const [emails, setEmails] = useState([]);
+  const [isSync, setIsSync] = useState(false);
+  const [emailSelect, setEmailSelect] = useState([]);
+
   const loadDetailEvent = async () => {
     try {
       const newEvent = await getDetailEvent(selectedSlot?.recurring_id);
+
       setFrequency(newEvent?.data?.frequency);
       setDetailEven(newEvent?.data);
     } catch (error) {
@@ -43,12 +59,14 @@ function ModalCreateCalendar({
       setDescription("");
       setFrequency("none");
       setDetailEven(null);
+      setEmailSelect([]);
     } else {
       setDescription(selectedSlot?.description || "");
       setTitle(selectedSlot?.title || "");
       if (selectedSlot?.recurring_id) {
         loadDetailEvent();
       }
+      handleCheckSync();
     }
   }, [isOpen]);
 
@@ -108,19 +126,38 @@ function ModalCreateCalendar({
   };
 
   const handleUpdateEvent = async () => {
-    if (detailEvent?.frequency && detailEvent?.frequency !== "none" && frequency !== 'none') {
+    if (
+      detailEvent?.frequency &&
+      detailEvent?.frequency !== "none" &&
+      frequency !== "none"
+    ) {
       setIsOpenModalUpdate(true);
       return;
     }
-    if (detailEvent?.frequency && detailEvent?.frequency !== "none" && frequency === 'none') {
-      onOk(title, description, frequency, mode);
+    if (
+      detailEvent?.frequency &&
+      detailEvent?.frequency !== "none" &&
+      frequency === "none"
+    ) {
+      onOk(title, description, frequency, mode, emailSelect);
       return;
     }
-    if (detailEvent?.frequency && detailEvent?.frequency === "none" && frequency !== 'none') {
-      onOk(title, description, frequency, mode);
+    if (
+      detailEvent?.frequency &&
+      detailEvent?.frequency === "none" &&
+      frequency !== "none"
+    ) {
+      onOk(title, description, frequency, mode, emailSelect);
       return;
     }
-    onOk(title, description, frequency, mode, detailEvent?.frequency);
+    onOk(
+      title,
+      description,
+      frequency,
+      mode,
+      emailSelect,
+      detailEvent?.frequency
+    );
   };
 
   const handleChangeRepeat = (value) => {
@@ -148,6 +185,25 @@ function ModalCreateCalendar({
     } finally {
       onClose(false);
       setIsOpenModal(false);
+    }
+  };
+
+  const handleChange = (values) => {
+    setEmailSelect(values);
+  };
+
+  const handleCheckSync = async () => {
+    try {
+      const sync = await checkSyncToGoogle(profile?.id);
+      const listEmail = await getListEmail(profile?.id);
+      const convertListEmail = listEmail?.users?.map((item) => ({
+        label: item.email,
+        value: item.email,
+      }));
+      setEmails(convertListEmail);
+      setIsSync(!!sync?.data?.length);
+    } catch (error) {
+      handleErrorMessage(error);
     }
   };
 
@@ -213,6 +269,16 @@ function ModalCreateCalendar({
                 />
               </div>
             )}
+          </div>
+          <div>
+            <Select
+              mode="multiple"
+              style={{ width: "100%" }}
+              placeholder="chọn email để chia sẻ"
+              onChange={handleChange}
+              options={emails}
+              // disabled={isSync}
+            />
           </div>
           <Input.TextArea
             placeholder="Nhập mô tả"
@@ -293,7 +359,7 @@ function ModalCreateCalendar({
             </Button>
             <Button
               onClick={() => {
-                onOk(title, description, frequency, mode);
+                onOk(title, description, frequency, mode, emailSelect);
                 setIsOpenModalUpdate(false);
               }}
               type="primary"

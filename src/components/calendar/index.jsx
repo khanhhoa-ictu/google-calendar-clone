@@ -22,6 +22,7 @@ import { STATUS_EVENT } from "../../helper/constants";
 import { Button, Modal, notification } from "antd";
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
+
 function DnDResource({ profile }) {
   const [myEventsList, setMyEventsList] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -77,6 +78,7 @@ function DnDResource({ profile }) {
     description,
     frequency,
     mode,
+    emailSelect,
     oldFrequency = ""
   ) => {
     if (!title) {
@@ -92,6 +94,7 @@ function DnDResource({ profile }) {
       start_time: moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
       end_time: moment(selectedSlot.end_time).format("YYYY-MM-DD HH:mm:ss"),
       frequency,
+      emails:emailSelect,
       accessToken,
     };
 
