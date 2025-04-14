@@ -198,8 +198,8 @@ function ModalCreateCalendar({
       const sync = await checkSyncToGoogle(profile?.id);
       const listEmail = await getListEmail(profile?.id);
       const convertListEmail = listEmail?.users?.map((item) => ({
-        label: item.email,
-        value: item.email,
+        label: item.google_email,
+        value: item.google_email,
       }));
       setEmails(convertListEmail);
       setIsSync(!!sync?.data?.length);
