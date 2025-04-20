@@ -206,10 +206,9 @@ function DnDResource({ profile }) {
           onSelectSlot={handleSelectSlot}
           view={viewMode}
           eventPropGetter={(event) => {
-            // giả sử userEmail là email của người dùng hiện tại
+            // userEmail là email của người dùng hiện tại
             const userEmail = profile.google_email;
 
-            // tìm status của user đó
             const attendee = event.attendees?.find(
               (a) => a.email === userEmail
             );
@@ -220,7 +219,7 @@ function DnDResource({ profile }) {
             let color = "white"
             if (status === "declined") backgroundColor = "#f44336"; // đỏ
             else if (status === "accepted")
-              backgroundColor = "#3174ad"; // xanh lá
+              backgroundColor = "#3174ad"; 
             else if (status === "needsAction") {
               color = "#039be5"
               backgroundColor = "white"; // cam
