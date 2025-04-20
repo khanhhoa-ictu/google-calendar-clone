@@ -34,7 +34,7 @@ function DnDResource({ profile }) {
 
   const moveEvent = async ({ event, start, end }) => {
     const accessToken = localStorage.getItem("accessToken");
-   
+
     try {
       const newEvent = await getDetailEvent(event?.id);
       const params = {
@@ -45,10 +45,10 @@ function DnDResource({ profile }) {
         end_time: moment(end).format("YYYY-MM-DD HH:mm:ss"),
         id: event?.id,
         accessToken,
-        
+
         recurring_id: event?.recurring_id,
-        frequency : newEvent?.data?.frequency,
-        emails: newEvent?.data?.share_email
+        frequency: newEvent?.data?.frequency,
+        emails: newEvent?.data?.share_email,
       };
       setParamsMoveEvent(params);
       if (newEvent?.data?.frequency === "none") {
@@ -95,7 +95,7 @@ function DnDResource({ profile }) {
       start_time: moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
       end_time: moment(selectedSlot.end_time).format("YYYY-MM-DD HH:mm:ss"),
       frequency,
-      emails:emailSelect,
+      emails: emailSelect,
       accessToken,
     };
 
@@ -163,22 +163,22 @@ function DnDResource({ profile }) {
   const handleConfirmOnly = async () => {
     try {
       await updateEvent(pramsMoveEvent);
-      handleLoadCalendar()
+      handleLoadCalendar();
     } catch (error) {
       handleErrorMessage(error);
-    }finally{
-      setModalConfirmMove(false)
+    } finally {
+      setModalConfirmMove(false);
     }
   };
 
   const handleConFirmList = async () => {
     try {
       await updateRecurringEvent(pramsMoveEvent.recurring_id, pramsMoveEvent);
-      handleLoadCalendar()
+      handleLoadCalendar();
     } catch (error) {
-      handleErrorMessage(error)
-    }finally{
-      setModalConfirmMove(false)
+      handleErrorMessage(error);
+    } finally {
+      setModalConfirmMove(false);
     }
   };
 
@@ -205,6 +205,36 @@ function DnDResource({ profile }) {
           showMultiDayTimes={true}
           onSelectSlot={handleSelectSlot}
           view={viewMode}
+          eventPropGetter={(event) => {
+            // giả sử userEmail là email của người dùng hiện tại
+            const userEmail = profile.google_email;
+
+            // tìm status của user đó
+            const attendee = event.attendees?.find(
+              (a) => a.email === userEmail
+            );
+
+            const status = attendee?.response_status;
+
+            let backgroundColor = "#3174ad"; // mặc định
+            let color = "white"
+            if (status === "declined") backgroundColor = "#f44336"; // đỏ
+            else if (status === "accepted")
+              backgroundColor = "#3174ad"; // xanh lá
+            else if (status === "needsAction") {
+              color = "#039be5"
+              backgroundColor = "white"; // cam
+            }
+
+            return {
+              style: {
+                backgroundColor,
+                color: color || "white",
+                borderRadius: "5px",
+                padding: "2px",
+              },
+            };
+          }}
           components={{
             toolbar: (props) => (
               <CustomToolbar

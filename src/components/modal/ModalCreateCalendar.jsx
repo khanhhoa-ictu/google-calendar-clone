@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from "react";
 import {
   Button,
   DatePicker,
   Input,
   Modal,
   Select,
-  Space,
-  TimePicker,
+  TimePicker
 } from "antd";
-import styles from "./styles.module.scss";
-import moment from "moment";
 import dayjs from "dayjs";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { useProfile } from "../../context/ProfileContext";
 import { handleErrorMessage } from "../../helper";
 import { STATUS_EVENT } from "../../helper/constants";
 import {
+  changeStatusEventShare,
   checkSyncToGoogle,
   deleteEvent,
   deleteRecurringEvent,
-  getDetailEvent,
+  getDetailEvent
 } from "../../service/event";
-import { useProfile } from "../../context/ProfileContext";
 import { getListEmail } from "../../service/user";
+import styles from "./styles.module.scss";
 
 function ModalCreateCalendar({
   isOpen,
@@ -41,11 +41,11 @@ function ModalCreateCalendar({
   const [emails, setEmails] = useState([]);
   const [isSync, setIsSync] = useState(false);
   const [emailSelect, setEmailSelect] = useState([]);
-  
+  console.log(selectedSlot);
   const loadDetailEvent = async () => {
     try {
       const newEvent = await getDetailEvent(selectedSlot?.id);
-      setEmailSelect(newEvent.data?.share_email || [])
+      setEmailSelect(newEvent.data?.share_email || []);
       setFrequency(newEvent?.data?.frequency);
       setDetailEven(newEvent?.data);
     } catch (error) {
@@ -60,7 +60,7 @@ function ModalCreateCalendar({
       setFrequency("none");
       setDetailEven(null);
       setEmailSelect([]);
-      setEmails([])
+      setEmails([]);
     } else {
       setDescription(selectedSlot?.description || "");
       setTitle(selectedSlot?.title || "");
@@ -207,6 +207,50 @@ function ModalCreateCalendar({
       handleErrorMessage(error);
     }
   };
+  const handleChangeStatusEvent = async (status) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const params = {
+      event_id: selectedSlot?.id,
+      email: profile?.google_email,
+      response_status: status ,
+      accessToken
+    }
+    try {
+      await changeStatusEventShare(params);
+      onClose(false);
+    } catch (error) {
+      handleErrorMessage(error);
+    }
+  };
+  const getStyle = () => {
+    const userEmail = profile.google_email;
+
+    // tìm status của user đó
+    const attendee = selectedSlot.attendees?.find((a) => a.email === userEmail);
+
+    const status = attendee?.response_status;
+    console.log(status);
+
+    return (
+      <div className="flex justify-between">
+        <p>Tham dự: </p>
+        <div className="flex gap-3">
+          <button
+            className={`${status === "accepted" && "!bg-blue-300"}`}
+            onClick={() => handleChangeStatusEvent("accepted")}
+          >
+            Có
+          </button>
+          <button
+            className={`${status === "declined" && "!bg-blue-300"}`}
+            onClick={() => handleChangeStatusEvent("declined")}
+          >
+            Không
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -223,6 +267,7 @@ function ModalCreateCalendar({
         onCancel={() => onClose(false)}
         width={520}
         centered
+        okButtonProps={{ disabled: selectedSlot?.can_edit === false }}
       >
         <div className={styles.modalCreateCalendar}>
           <Input
@@ -230,11 +275,13 @@ function ModalCreateCalendar({
             onChange={(e) => setTitle(e.target.value)}
             placeholder="nhập tiêu đề"
             size="large"
+            disabled={selectedSlot?.can_edit === false}
           />
           <Select
             className="!h-[40px]"
             value={frequency}
             onChange={handleChangeRepeat}
+            disabled={selectedSlot?.can_edit === false}
             options={[
               { value: "none", label: "không lặp" },
               { value: "daily", label: "lặp lại mỗi ngày" },
@@ -249,6 +296,7 @@ function ModalCreateCalendar({
               value={dayjs(selectedSlot?.start_time) || null}
               size="large"
               placeholder="Select date"
+              disabled={selectedSlot?.can_edit === false}
             />
             {view !== "month" && (
               <div className="flex gap-3">
@@ -259,6 +307,7 @@ function ModalCreateCalendar({
                   value={dayjs(selectedSlot?.start_time) || null}
                   size="large"
                   placeholder="Thời gian bắt đầu"
+                  disabled={selectedSlot?.can_edit === false}
                 />
                 <TimePicker
                   minuteStep={15}
@@ -267,6 +316,7 @@ function ModalCreateCalendar({
                   value={dayjs(selectedSlot?.end_time) || null}
                   size="large"
                   placeholder="Thời gian kết thúc"
+                  disabled={selectedSlot?.can_edit === false}
                 />
               </div>
             )}
@@ -279,7 +329,7 @@ function ModalCreateCalendar({
               onChange={handleChange}
               options={emails}
               value={emailSelect}
-              // disabled={isSync}
+              disabled={isSync || selectedSlot?.can_edit === false}
             />
           </div>
           <Input.TextArea
@@ -287,9 +337,15 @@ function ModalCreateCalendar({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
+            disabled={selectedSlot?.can_edit === false}
           />
+          {selectedSlot?.can_edit === false && getStyle()}
           {mode === STATUS_EVENT.UPDATE && (
-            <Button className={styles.btnDelete} onClick={handleDeleteEvent}>
+            <Button
+              className={styles.btnDelete}
+              onClick={handleDeleteEvent}
+              disabled={selectedSlot?.can_edit === false}
+            >
               Xoá
             </Button>
           )}

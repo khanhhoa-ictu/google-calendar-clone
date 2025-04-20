@@ -24,6 +24,10 @@ export const handleRefreshTokenGoogle = (userId) =>sendGet(`/google/auth/refresh
 
 export const registerWebhook = (accessToken, email) =>sendPost("/google/register-webhook",{accessToken, email})
 
+export const changeStatusEventShare = (data) => sendPost("/event/respond", data)
+
+export const changeStatusRecurringEventShare = (data) => sendPost("/recurring/event/respond", data)
+
 
 
 
