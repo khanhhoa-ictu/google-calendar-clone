@@ -20,6 +20,7 @@ function CustomToolbar({
   profile,
   myEventsList,
   handleLoadCalendar,
+  handleVote
 }) {
   const [isSync, setIsSync] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -142,6 +143,7 @@ function CustomToolbar({
       </Space>
 
       <div className="flex gap-2 items-center min-w-[370px] justify-end">
+        <Button onClick={handleVote} >Tạo vote</Button>
         <Button
           disabled={!isSync}
           loading={loading}
