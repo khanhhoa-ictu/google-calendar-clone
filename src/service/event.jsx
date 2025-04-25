@@ -26,6 +26,9 @@ export const registerWebhook = (accessToken, email) =>sendPost("/google/register
 
 export const changeStatusEventShare = (data) => sendPost("/event/respond", data)
 
+export const changeStatusEventShareRecurring = (data) => sendPost("/event/respond/recurring", data)
+
+
 export const changeStatusRecurringEventShare = (data) => sendPost("/recurring/event/respond", data)
 
 

@@ -12,9 +12,11 @@ import { useProfile } from "./context/ProfileContext";
 import ForgotPassWord from "./page/forgot-password";
 import HomePage from "./page/home";
 import LoginPage from "./page/login";
+import Meeting from "./page/meeting";
 import Manager from "./page/manager";
 import Register from "./page/register";
 import { handleRefreshTokenGoogle } from "./service/event";
+import MeetingDetail from "./page/meeting-detail";
 
 moment.locale("vi");
 function App() {
@@ -47,6 +49,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage profile={profile} />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/meeting" element={<Meeting profile={profile} />} />
+          <Route path="/meeting/:id" element={<MeetingDetail profile={profile} />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassWord />} />
           <Route path="/manager" element={<Manager profile={profile} />} />

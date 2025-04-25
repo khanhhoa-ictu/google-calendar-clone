@@ -46,3 +46,34 @@ CREATE TABLE event_attendees (
     response_status ENUM('needsAction', 'declined', 'tentative', 'accepted') DEFAULT 'needsAction',
     FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE
 );
+
+CREATE TABLE meeting_poll (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_by INT NOT NULL,  -- user_id người tạo poll
+  finalized_event_id INT DEFAULT NULL, -- lưu ID sự kiện được chọn
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+CREATE TABLE poll_options (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  poll_id INT NOT NULL,
+  title VARCHAR(255),
+  description TEXT,
+  start_time DATETIME NOT NULL,
+  end_time DATETIME NOT NULL,
+  FOREIGN KEY (poll_id) REFERENCES meeting_poll(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE poll_votes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  option_id INT NOT NULL,
+  voter_email VARCHAR(255) NOT NULL,
+  response_status ENUM('accepted', 'declined', 'tentative') DEFAULT 'accepted',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (option_id) REFERENCES poll_options(id)
+);

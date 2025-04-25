@@ -1,11 +1,4 @@
-import {
-  Button,
-  DatePicker,
-  Input,
-  Modal,
-  Select,
-  TimePicker
-} from "antd";
+import { Button, DatePicker, Input, Modal, Select, TimePicker } from "antd";
 import dayjs from "dayjs";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -14,10 +7,11 @@ import { handleErrorMessage } from "../../helper";
 import { STATUS_EVENT } from "../../helper/constants";
 import {
   changeStatusEventShare,
+  changeStatusEventShareRecurring,
   checkSyncToGoogle,
   deleteEvent,
   deleteRecurringEvent,
-  getDetailEvent
+  getDetailEvent,
 } from "../../service/event";
 import { getListEmail } from "../../service/user";
 import styles from "./styles.module.scss";
@@ -37,11 +31,12 @@ function ModalCreateCalendar({
   const [frequency, setFrequency] = useState("none");
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModalUpdate, setIsOpenModalUpdate] = useState(false);
+  const [isOpenModalResponse, setIsOpenModalResponse] = useState(false);
   const [detailEvent, setDetailEven] = useState(null);
   const [emails, setEmails] = useState([]);
   const [isSync, setIsSync] = useState(false);
   const [emailSelect, setEmailSelect] = useState([]);
-  console.log(selectedSlot);
+  const [statusResponse, setStatusResponse] = useState("");
   const loadDetailEvent = async () => {
     try {
       const newEvent = await getDetailEvent(selectedSlot?.id);
@@ -207,20 +202,35 @@ function ModalCreateCalendar({
       handleErrorMessage(error);
     }
   };
-  const handleChangeStatusEvent = async (status) => {
+
+  const handleResponseEvent = async (status, all = false) => {
     const accessToken = localStorage.getItem("accessToken");
     const params = {
       event_id: selectedSlot?.id,
       email: profile?.google_email,
-      response_status: status ,
-      accessToken
-    }
+      response_status: status,
+      accessToken,
+    };
     try {
-      await changeStatusEventShare(params);
+      if (all) {
+        await changeStatusEventShareRecurring(params);
+      } else {
+        await changeStatusEventShare(params);
+      }
       onClose(false);
     } catch (error) {
       handleErrorMessage(error);
     }
+  };
+
+  const handleChangeStatusEvent = async (status) => {
+    console.log(frequency);
+    if (frequency !== "none") {
+      setStatusResponse(status);
+      setIsOpenModalResponse(true);
+      return;
+    }
+    handleResponseEvent(status);
   };
   const getStyle = () => {
     const userEmail = profile.google_email;
@@ -424,6 +434,44 @@ function ModalCreateCalendar({
               size="large"
             >
               Cập nhật chuỗi sự kiện
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        title="Phản hồi sự kiện"
+        open={isOpenModalResponse}
+        onOk={null}
+        onCancel={() => setIsOpenModalResponse(false)}
+        footer={null}
+        centered
+        className="delete-event-modal"
+      >
+        <div className="!p-6">
+          <p className="!py-6">
+            Bạn có muốn tham gia tất cả sự kiện trong chuỗi này không?
+          </p>
+          <div className="modal-buttons flex justify-between">
+            <Button
+              onClick={() => {
+                handleResponseEvent(statusResponse);
+                setIsOpenModalResponse(false);
+              }}
+              className="btn-cancel"
+              size="large"
+            >
+              Chỉ sự kiện này
+            </Button>
+            <Button
+              onClick={() => {
+                handleResponseEvent(statusResponse, true);
+                setIsOpenModalResponse(false);
+              }}
+              type="primary"
+              size="large"
+            >
+              Sụ kiện này và các sự kiện tiếp theo
             </Button>
           </div>
         </div>
