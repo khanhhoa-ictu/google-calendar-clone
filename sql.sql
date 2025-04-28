@@ -36,6 +36,7 @@ CREATE TABLE event (
     instance_id varchar(255) DEFAULT NULL,
     last_resource_id varchar(255) DEFAULT NULL,
     UNIQUE KEY unique_last_resource_id (last_resource_id),
+    status VARCHAR(50) DEFAULT 'normal',
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
