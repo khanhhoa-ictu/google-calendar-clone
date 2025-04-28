@@ -208,20 +208,19 @@ function DnDResource({ profile }) {
           eventPropGetter={(event) => {
             // userEmail là email của người dùng hiện tại
             const userEmail = profile.google_email;
-
             const attendee = event.attendees?.find(
               (a) => a.email === userEmail
             );
+            const statusMeeting = event.status === "meeting";
 
             const status = attendee?.response_status;
 
-            let backgroundColor = "#3174ad"; // mặc định
-            let color = "white"
+            let backgroundColor = statusMeeting ? "#29a398" : "#3174ad"; // mặc định
+            let color = "white";
             if (status === "declined") backgroundColor = "#f44336"; // đỏ
-            else if (status === "accepted")
-              backgroundColor = "#3174ad"; 
+            else if (status === "accepted") backgroundColor = "#3174ad";
             else if (status === "needsAction") {
-              color = "#039be5"
+              color = "#039be5";
               backgroundColor = "white"; // cam
             }
 

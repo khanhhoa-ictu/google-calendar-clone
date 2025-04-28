@@ -10,6 +10,7 @@ import { handleErrorMessage } from "../../helper/index";
 import classNames from "classnames";
 import dayjs from "dayjs";
 import { checkSyncToGoogle, syncGoogleCalendar } from "../../service/event";
+import { useLocation } from "react-router-dom";
 
 function CustomToolbar({
   onNavigate,
@@ -24,7 +25,8 @@ function CustomToolbar({
 }) {
   const [isSync, setIsSync] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const location = useLocation(); // 👈 lấy location
+  const isMeetingPage = location.pathname === "/meeting"; // 👈 kiểm tra đường dẫn
   const handleChangeView = (value) => {
     setViewMode(value);
   };
@@ -143,7 +145,7 @@ function CustomToolbar({
       </Space>
 
       <div className="flex gap-2 items-center min-w-[370px] justify-end">
-        <Button onClick={handleVote} >Tạo vote</Button>
+        <Button onClick={handleVote}  disabled={!isMeetingPage}>Tạo vote</Button>
         <Button
           disabled={!isSync}
           loading={loading}
