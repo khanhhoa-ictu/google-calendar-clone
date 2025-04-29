@@ -1,4 +1,4 @@
-import { Button, Modal, notification } from "antd";
+import { Button, Input, Modal, notification } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
@@ -25,42 +25,13 @@ const DnDCalendar = withDragAndDrop(Calendar);
 
 function CalendarMeeting({ profile }) {
   const [myEventsList, setMyEventsList] = useState([]);
-  const [selectedSlot, setSelectedSlot] = useState(null);
-  const [isOpenModal, setIsOpenModal] = useState(false);
-  const [mode, setMode] = useState(STATUS_EVENT.ADD);
   const [viewMode, setViewMode] = useState("week");
-  const [pramsMoveEvent, setParamsMoveEvent] = useState(null);
-  const [modalConfirmMove, setModalConfirmMove] = useState(false);
-  const navigate = useNavigate()
-  const moveEvent = async ({ event, start, end }) => {
-    const accessToken = localStorage.getItem("accessToken");
-
-    try {
-      const newEvent = await getDetailEvent(event?.id);
-      const params = {
-        user_id: profile?.id,
-        title: event?.title,
-        description: event?.description,
-        start_time: moment(start).format("YYYY-MM-DD HH:mm:ss"),
-        end_time: moment(end).format("YYYY-MM-DD HH:mm:ss"),
-        id: event?.id,
-        accessToken,
-
-        recurring_id: event?.recurring_id,
-        frequency: newEvent?.data?.frequency,
-        emails: newEvent?.data?.share_email,
-      };
-      setParamsMoveEvent(params);
-      if (newEvent?.data?.frequency === "none") {
-        await updateEvent(params);
-        handleLoadCalendar();
-      } else {
-        setModalConfirmMove(true);
-      }
-    } catch (error) {
-      handleErrorMessage(error);
-    }
-  };
+  const [modalVote, setModalVote] = useState(false);
+  const [vote, setVote] = useState({
+    title: "",
+    description: "",
+  });
+  const navigate = useNavigate();
 
   const handleSelectSlot = async (value) => {
     const defaultTitle = {
@@ -69,117 +40,7 @@ function CalendarMeeting({ profile }) {
       title: "",
       id: v4(),
     };
-    // setSelectedSlot(defaultTitle);
     setMyEventsList([...myEventsList, defaultTitle]);
-    // setIsOpenModal(true);
-  };
-
-  const handleCreateNewEvent = async (
-    title,
-    description,
-    frequency,
-    mode,
-    emailSelect,
-    oldFrequency = ""
-  ) => {
-    if (!title) {
-      notification.error({ message: "vui lòng nhập tiêu đề" });
-      return;
-    }
-    const accessToken = localStorage.getItem("accessToken");
-
-    const params = {
-      user_id: profile?.id,
-      title: title,
-      description: description,
-      start_time: moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
-      end_time: moment(selectedSlot.end_time).format("YYYY-MM-DD HH:mm:ss"),
-      frequency,
-      emails: emailSelect,
-      accessToken,
-    };
-
-    try {
-      if (mode === STATUS_EVENT.UPDATE) {
-        if (oldFrequency) {
-          await updateEvent({ ...params, id: selectedSlot.id });
-        } else {
-          await updateRecurringEvent(selectedSlot?.recurring_id, {
-            ...params,
-            id: selectedSlot.id,
-          });
-        }
-      } else {
-        await addEvent(params);
-      }
-      handleLoadCalendar();
-      setSelectedSlot(null);
-      setMode(STATUS_EVENT.ADD);
-      setIsOpenModal(false);
-    } catch (error) {
-      handleErrorMessage(error);
-    }
-  };
-
-  const handleCloseModal = () => {
-    handleLoadCalendar();
-    setIsOpenModal(false);
-    setSelectedSlot(null);
-    setMode(STATUS_EVENT.ADD);
-  };
-
-  const handleChangeTime = (value) => {
-    const index = myEventsList.findIndex((item) => item.id === value.id);
-    if (index === -1) {
-      return;
-    }
-    const cloneMyEventList = [...myEventsList];
-    cloneMyEventList[index] = value;
-
-    setSelectedSlot(value);
-    setMyEventsList(cloneMyEventList);
-  };
-
-  const handleViewDetail = (event) => {
-    setSelectedSlot(event);
-    setMode(STATUS_EVENT.UPDATE);
-    setIsOpenModal(true);
-  };
-
-  // const handleLoadCalendar = async () => {
-  //   try {
-  //     const dataCalendar = await getListCalendar(profile?.id);
-  //     const convertDataCalendar = dataCalendar?.data?.map((item) => ({
-  //       ...item,
-  //       start_time: new Date(item.start_time),
-  //       end_time: new Date(item.end_time),
-  //     }));
-  //     setMyEventsList(convertDataCalendar);
-  //   } catch (error) {
-  //     handleErrorMessage(error);
-  //   }
-  // };
-
-  const handleConfirmOnly = async () => {
-    try {
-      await updateEvent(pramsMoveEvent);
-      handleLoadCalendar();
-    } catch (error) {
-      handleErrorMessage(error);
-    } finally {
-      setModalConfirmMove(false);
-    }
-  };
-
-  const handleConFirmList = async () => {
-    try {
-      await updateRecurringEvent(pramsMoveEvent.recurring_id, pramsMoveEvent);
-      handleLoadCalendar();
-    } catch (error) {
-      handleErrorMessage(error);
-    } finally {
-      setModalConfirmMove(false);
-    }
   };
 
   const handleVote = async () => {
@@ -188,15 +49,15 @@ function CalendarMeeting({ profile }) {
       end_time: moment(item?.end_time).format("YYYY-MM-DD HH:mm:ss"),
     }));
     const params = {
-      title: "",
-      description: "",
+      title: vote.title,
+      description: vote.description,
       options: convertVote,
       created_by: profile?.id,
     };
     try {
       const response = await createPoll(params);
-      setMyEventsList([])
-      navigate(`/meeting/${response.pollId}`)
+      setMyEventsList([]);
+      navigate(`/meeting/${response.pollId}`);
     } catch (error) {
       handleErrorMessage(error);
     }
@@ -214,7 +75,6 @@ function CalendarMeeting({ profile }) {
           longPressThreshold={500}
           timeslots={4}
           step={30}
-          onEventDrop={moveEvent}
           resizable={false}
           selectable
           showMultiDayTimes={true}
@@ -256,51 +116,40 @@ function CalendarMeeting({ profile }) {
                 viewMode={viewMode}
                 profile={profile}
                 myEventsList={myEventsList}
-                handleLoadCalendar={() => handleLoadCalendar()}
-                handleVote={() => handleVote()}
+                handleVote={() => setModalVote(true)}
               />
             ),
           }}
-          onSelectEvent={handleViewDetail}
         />
       </DndProvider>
-      <ModalCreateCalendar
-        isOpen={isOpenModal}
-        onClose={handleCloseModal}
-        onOk={handleCreateNewEvent}
-        selectedSlot={selectedSlot}
-        handleChangeTime={handleChangeTime}
-        mode={mode}
-        view={viewMode}
-      />
 
       <Modal
-        title="Cập nhật sự kiện"
-        open={modalConfirmMove}
+        title="Tạo cuộc họp bỏ phiếu"
+        open={modalVote}
         onOk={null}
-        onCancel={() => setModalConfirmMove(false)}
+        onCancel={() => setModalVote(false)}
         footer={null}
         centered
         className="delete-event-modal"
       >
         <div className="!p-6">
-          <p className="!py-6">
-            Bạn có muốn cập nhật tất cả chuỗi sự kiện này không?
-          </p>
-          <div className="modal-buttons flex justify-between">
-            <Button
-              onClick={() => handleConfirmOnly()}
-              className="btn-cancel"
-              size="large"
-            >
-              Cập nhật sự kiện này
-            </Button>
-            <Button
-              onClick={() => handleConFirmList()}
-              type="primary"
-              size="large"
-            >
-              Cập nhật chuỗi sự kiện
+          <div className="flex flex-col gap-4">
+            <Input
+              placeholder="Nhập tiêu đề"
+              value={vote.title}
+              onChange={(e) => setVote({ ...vote, title: e.target.value })}
+            />
+            <Input.TextArea
+              placeholder="nhập miêu tả"
+              value={vote.description}
+              onChange={(e) =>
+                setVote({ ...vote, description: e.target.value })
+              }
+            />
+          </div>
+          <div className="flex justify-end w-full !mt-6">
+            <Button onClick={() => handleVote()} className="!px-6 !h-[40px]">
+              Tạo
             </Button>
           </div>
         </div>

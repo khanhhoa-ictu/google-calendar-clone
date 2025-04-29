@@ -13,7 +13,6 @@ function Navbar() {
     Cookies.remove("token");
     navigate("/login");
   };
-
   return (
     <div className="bg-[#f8fafd] min-w-[240px]">
       <div className="flex flex-col justify-between h-full !py-6">
@@ -21,14 +20,14 @@ function Navbar() {
           <h1 className="font-bold !text-2xl !lg:text-[32px] uppercase gradient-text !mt-4">
             My Calendar
           </h1>
-          <div className="flex flex-col text-left !ml-6 !mt-10 gap-5 text-xl">
+          <div className="flex flex-col text-left !ml-6 !mt-10 gap-5 text-lg">
             <Link to="/" className="!text-[#333]">
               Lịch cá nhân
             </Link>
             <Link to="/meeting" className="!text-[#333]">
-              Lịch họp
+              Tạo cuộc họp bỏ phiếu
             </Link>
-            {profile?.role === ROLE.ADMIN && (
+            {Number(profile?.role) === ROLE.ADMIN && (
               <Link to="/manager" className="!text-[#333]">
                 Trang quản lý
               </Link>
