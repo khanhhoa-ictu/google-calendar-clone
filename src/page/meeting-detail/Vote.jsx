@@ -1,4 +1,4 @@
-import { Button, Input, notification, Radio } from "antd";
+import { Button, Checkbox, Input, notification, Radio } from "antd";
 import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -11,10 +11,10 @@ import {
 } from "../../service/meeting";
 function Vote({ pollDetail }) {
   const { profile } = useProfile();
- 
+
   const navigate = useNavigate();
   const { id } = useParams();
-  const [value, setValue] = useState();
+  const [value, setValue] = useState([]);
   const [poll, setPoll] = useState({
     title: "",
     description: "",
@@ -31,7 +31,7 @@ function Vote({ pollDetail }) {
   const handleVote = async () => {
     const params = {
       email: profile.email,
-      option_ids: [value],
+      option_ids: value,
     };
     try {
       await votePoll(params, id);
@@ -99,31 +99,37 @@ function Vote({ pollDetail }) {
               }
             />
           </div>
-          <div className="flex justify-end w-full">
-            <Button onClick={handleUpdateEvent} className="!px-6 !h-[40px]">
-              Cập nhật thông tin cho sự kiện
-            </Button>
-          </div>
+          {profile?.id === pollDetail?.poll?.created_by && (
+            <div className="flex justify-end w-full">
+              <Button
+                onClick={handleUpdateEvent}
+                className="!px-6 !h-[40px]"
+                disabled={profile?.id !== pollDetail?.poll?.created_by}
+              >
+                Cập nhật thông tin cho sự kiện
+              </Button>
+            </div>
+          )}
         </div>
         <h3 className="text-left !my-8 text-xl">Lựa chọn thời gian phù hợp:</h3>
 
         <div className="w-full text-left">
-          <Radio.Group
+          <Checkbox.Group
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(values) => setValue(values)}
             className="!flex !flex-col !gap-4"
             disabled={profile?.id === pollDetail?.poll?.created_by}
           >
             {pollDetail?.options?.map((item) => {
               return (
-                <Radio value={item.id} className="!text-lg">
+                <Checkbox value={item.id} className="!text-lg">
                   {moment(item?.start_time).format("HH:mm")}-
                   {moment(item?.end_time).format("HH:mm")} ({item?.vote_count}{" "}
                   lượt chọn)
-                </Radio>
+                </Checkbox>
               );
             })}
-          </Radio.Group>
+          </Checkbox.Group>
         </div>
         <div className="mt-4 text-right">
           {profile?.id === pollDetail?.poll?.created_by ? (

@@ -277,7 +277,11 @@ function ModalCreateCalendar({
         onCancel={() => onClose(false)}
         width={520}
         centered
-        okButtonProps={{ disabled: selectedSlot?.can_edit === false }}
+        okButtonProps={{
+          disabled:
+            selectedSlot?.can_edit === false ||
+            selectedSlot?.status === "meeting",
+        }}
       >
         <div className={styles.modalCreateCalendar}>
           <Input
@@ -285,13 +289,19 @@ function ModalCreateCalendar({
             onChange={(e) => setTitle(e.target.value)}
             placeholder="nhập tiêu đề"
             size="large"
-            disabled={selectedSlot?.can_edit === false}
+            disabled={
+              selectedSlot?.can_edit === false ||
+              selectedSlot?.status === "meeting"
+            }
           />
           <Select
             className="!h-[40px]"
             value={frequency}
             onChange={handleChangeRepeat}
-            disabled={selectedSlot?.can_edit === false}
+            disabled={
+              selectedSlot?.can_edit === false ||
+              selectedSlot?.status === "meeting"
+            }
             options={[
               { value: "none", label: "không lặp" },
               { value: "daily", label: "lặp lại mỗi ngày" },
@@ -306,7 +316,10 @@ function ModalCreateCalendar({
               value={dayjs(selectedSlot?.start_time) || null}
               size="large"
               placeholder="Select date"
-              disabled={selectedSlot?.can_edit === false}
+              disabled={
+                selectedSlot?.can_edit === false ||
+                selectedSlot?.status === "meeting"
+              }
             />
             {view !== "month" && (
               <div className="flex gap-3">
@@ -317,7 +330,10 @@ function ModalCreateCalendar({
                   value={dayjs(selectedSlot?.start_time) || null}
                   size="large"
                   placeholder="Thời gian bắt đầu"
-                  disabled={selectedSlot?.can_edit === false}
+                  disabled={
+                    selectedSlot?.can_edit === false ||
+                    selectedSlot?.status === "meeting"
+                  }
                 />
                 <TimePicker
                   minuteStep={15}
@@ -326,7 +342,10 @@ function ModalCreateCalendar({
                   value={dayjs(selectedSlot?.end_time) || null}
                   size="large"
                   placeholder="Thời gian kết thúc"
-                  disabled={selectedSlot?.can_edit === false}
+                  disabled={
+                    selectedSlot?.can_edit === false ||
+                    selectedSlot?.status === "meeting"
+                  }
                 />
               </div>
             )}
@@ -339,7 +358,11 @@ function ModalCreateCalendar({
               onChange={handleChange}
               options={emails}
               value={emailSelect}
-              disabled={isSync || selectedSlot?.can_edit === false}
+              disabled={
+                isSync ||
+                selectedSlot?.can_edit === false ||
+                selectedSlot?.status === "meeting"
+              }
             />
           </div>
           <Input.TextArea
@@ -347,14 +370,20 @@ function ModalCreateCalendar({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
-            disabled={selectedSlot?.can_edit === false}
+            disabled={
+              selectedSlot?.can_edit === false ||
+              selectedSlot?.status === "meeting"
+            }
           />
           {selectedSlot?.can_edit === false && getStyle()}
           {mode === STATUS_EVENT.UPDATE && (
             <Button
               className={styles.btnDelete}
               onClick={handleDeleteEvent}
-              disabled={selectedSlot?.can_edit === false}
+              disabled={
+                selectedSlot?.can_edit === false ||
+                selectedSlot?.status === "meeting"
+              }
             >
               Xoá
             </Button>
