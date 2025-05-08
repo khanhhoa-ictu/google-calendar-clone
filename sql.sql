@@ -13,7 +13,7 @@ CREATE TABLE user (
     google_email varchar(255) DEFAULT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)
+);
 CREATE TABLE recurring_events (
     id INT PRIMARY KEY AUTO_INCREMENT,
     frequency ENUM('none', 'daily', 'weekly', 'monthly') NOT NULL,
@@ -37,6 +37,7 @@ CREATE TABLE event (
     last_resource_id varchar(255) DEFAULT NULL,
     UNIQUE KEY unique_last_resource_id (last_resource_id),
     status VARCHAR(50) DEFAULT 'normal',
+    meet_link TEXT,
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
@@ -78,3 +79,6 @@ CREATE TABLE poll_votes (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (option_id) REFERENCES poll_options(id)
 );
+
+describe user;
+SELECT * FROM user;

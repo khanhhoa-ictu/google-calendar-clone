@@ -43,9 +43,11 @@ function Vote({ pollDetail }) {
   };
 
   const handleCreateEvent = async () => {
+    const accessToken = localStorage.getItem("access_token");
     const params = {
       poll_id: id,
       created_by: profile.id,
+      accessToken
     };
     try {
       await finalizePoll(params);
