@@ -34,6 +34,11 @@ function CalendarMeeting({ profile }) {
   const navigate = useNavigate();
 
   const handleSelectSlot = async (value) => {
+    const now = new Date();
+    if (value.start < now) {
+      notification.warning({ message: "Không thể tạo sự kiện trong quá khứ" });
+      return;
+    }
     const defaultTitle = {
       start_time: value.start,
       end_time: value.end,

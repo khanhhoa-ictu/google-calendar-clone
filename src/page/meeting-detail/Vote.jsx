@@ -1,7 +1,7 @@
 import { Button, Checkbox, Input, notification, Radio } from "antd";
 import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { useProfile } from "../../context/ProfileContext";
 import { handleErrorMessage } from "../../helper";
 import {
@@ -11,15 +11,16 @@ import {
 } from "../../service/meeting";
 function Vote({ pollDetail }) {
   const { profile } = useProfile();
-
+  const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams();
+  const fullUrl = `${window.location.origin}${location.pathname}`;
+  const [copied, setCopied] = useState(false);
   const [value, setValue] = useState([]);
   const [poll, setPoll] = useState({
     title: "",
     description: "",
   });
-
   const totalVote = useMemo(() => {
     const voteCount = pollDetail?.options?.map((item) => item?.vote_count);
     var count = voteCount?.reduce((accumulator, currentValue) => {
@@ -43,9 +44,11 @@ function Vote({ pollDetail }) {
   };
 
   const handleCreateEvent = async () => {
+    const accessToken = localStorage.getItem("accessToken");
     const params = {
       poll_id: id,
       created_by: profile.id,
+      accessToken,
     };
     try {
       await finalizePoll(params);
@@ -69,6 +72,13 @@ function Vote({ pollDetail }) {
     } catch (error) {
       handleErrorMessage(error);
     }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(fullUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   useEffect(() => {
@@ -98,6 +108,12 @@ function Vote({ pollDetail }) {
                 setPoll({ ...poll, description: e.target.value })
               }
             />
+            <div className="flex justify-between">
+              <p>URL: {fullUrl}</p>
+              <Button onClick={handleCopy}>
+                {copied ? "Đã sao chép" : "Sao chép"}
+              </Button>
+            </div>
           </div>
           {profile?.id === pollDetail?.poll?.created_by && (
             <div className="flex justify-end w-full">

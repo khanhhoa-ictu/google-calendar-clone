@@ -63,6 +63,11 @@ function DnDResource({ profile }) {
   };
 
   const handleSelectSlot = async (value) => {
+    const now = new Date();
+    if (value.start < now) {
+      message.warning("Không thể tạo sự kiện trong quá khứ");
+      return;
+    }
     const defaultTitle = {
       start_time: value.start,
       end_time: value.end,
@@ -214,11 +219,15 @@ function DnDResource({ profile }) {
             const statusMeeting = event.status === "meeting";
 
             const status = attendee?.response_status;
-
-            let backgroundColor = statusMeeting ? "#29a398" : "#3174ad"; // mặc định
+            let backgroundColor = statusMeeting ? "#29a398" : "#3174ad";
+            let textDecoration = "none";
             let color = "white";
-            if (status === "declined") backgroundColor = "#f44336"; // đỏ
-            else if (status === "accepted") backgroundColor = "#3174ad";
+            if (status === "declined") {
+              backgroundColor = "white"; // đỏ
+              textDecoration = "line-through";
+              color = "#039be5";
+            } else if (status === "accepted")
+              backgroundColor = statusMeeting ? "#29a398" : "#3174ad";
             else if (status === "needsAction") {
               color = "#039be5";
               backgroundColor = "white"; // cam
@@ -230,6 +239,7 @@ function DnDResource({ profile }) {
                 color: color || "white",
                 borderRadius: "5px",
                 padding: "2px",
+                textDecoration,
               },
             };
           }}

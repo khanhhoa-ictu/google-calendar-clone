@@ -31,6 +31,7 @@ CREATE TABLE event (
     last_resource_id varchar(255) DEFAULT NULL,
     UNIQUE KEY unique_last_resource_id (last_resource_id),
     status VARCHAR(50) DEFAULT 'normal',
+    meet_link TEXT,
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 

@@ -365,6 +365,15 @@ function ModalCreateCalendar({
               }
             />
           </div>
+          {selectedSlot?.status === "meeting" && (
+            <div>
+              google meet:{" "}
+              <a href={selectedSlot?.meet_link} target="_blank">
+                {selectedSlot?.meet_link}
+              </a>
+            </div>
+          )}
+
           <Input.TextArea
             placeholder="Nhập mô tả"
             value={description}
