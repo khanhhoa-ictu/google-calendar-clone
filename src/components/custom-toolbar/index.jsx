@@ -25,8 +25,8 @@ function CustomToolbar({
 }) {
   const [isSync, setIsSync] = useState(false);
   const [loading, setLoading] = useState(false);
-  const location = useLocation(); // 👈 lấy location
-  const isMeetingPage = location.pathname === "/meeting"; // 👈 kiểm tra đường dẫn
+  const location = useLocation();
+  const isMeetingPage = location.pathname === "/meeting";
   const handleChangeView = (value) => {
     setViewMode(value);
   };
