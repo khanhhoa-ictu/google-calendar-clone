@@ -45,7 +45,6 @@ function DnDResource({ profile }) {
         end_time: moment(end).format("YYYY-MM-DD HH:mm:ss"),
         id: event?.id,
         accessToken,
-
         recurring_id: event?.recurring_id,
         frequency: newEvent?.data?.frequency,
         emails: newEvent?.data?.share_email,
@@ -63,11 +62,6 @@ function DnDResource({ profile }) {
   };
 
   const handleSelectSlot = async (value) => {
-    const now = new Date();
-    if (value.start < now) {
-      message.warning("Không thể tạo sự kiện trong quá khứ");
-      return;
-    }
     const defaultTitle = {
       start_time: value.start,
       end_time: value.end,
@@ -97,8 +91,14 @@ function DnDResource({ profile }) {
       user_id: profile?.id,
       title: title,
       description: description,
-      start_time: moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
-      end_time: moment(selectedSlot.end_time).format("YYYY-MM-DD HH:mm:ss"),
+      start_time:
+        viewMode === "month"
+          ? moment(selectedSlot.start_time).format("YYYY-MM-DD")
+          : moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
+      end_time:
+        viewMode === "month"
+          ? moment(selectedSlot.end_time).add(1, "days").format("YYYY-MM-DD")
+          : moment(selectedSlot.end_time).format("YYYY-MM-DD HH:mm:ss"),
       frequency,
       emails: emailSelect,
       accessToken,
@@ -114,8 +114,10 @@ function DnDResource({ profile }) {
             id: selectedSlot.id,
           });
         }
+        notification.success({ message: "cập nhật sự kiện thành công" });
       } else {
         await addEvent(params);
+        notification.success({ message: "tạo sự kiện thành công" });
       }
       handleLoadCalendar();
       setSelectedSlot(null);

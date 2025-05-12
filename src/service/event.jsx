@@ -31,7 +31,7 @@ export const changeStatusEventShareRecurring = (data) => sendPost("/event/respon
 
 export const changeStatusRecurringEventShare = (data) => sendPost("/recurring/event/respond", data)
 
-
+export const updateRecurringFromEvent = (recurringId, params) =>sendPut(`/recurring-events/update-from-current/${recurringId}`, params)
 
 
 

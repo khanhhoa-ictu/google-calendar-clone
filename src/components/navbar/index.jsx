@@ -27,7 +27,7 @@ function Navbar() {
             <Link to="/meeting" className="!text-[#333]">
               Tạo cuộc họp bỏ phiếu
             </Link>
-            {Number(profile?.role) === ROLE.ADMIN && (
+            {profile?.role === ROLE.ADMIN && (
               <Link to="/manager" className="!text-[#333]">
                 Trang quản lý
               </Link>
