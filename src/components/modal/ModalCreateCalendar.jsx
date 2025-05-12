@@ -1,4 +1,13 @@
-import { Button, DatePicker, Input, Modal, Select, TimePicker } from "antd";
+import {
+  Button,
+  DatePicker,
+  Input,
+  Modal,
+  notification,
+  Select,
+  Spin,
+  TimePicker,
+} from "antd";
 import dayjs from "dayjs";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -37,7 +46,9 @@ function ModalCreateCalendar({
   const [isSync, setIsSync] = useState(false);
   const [emailSelect, setEmailSelect] = useState([]);
   const [statusResponse, setStatusResponse] = useState("");
+  const [loading, setLoading] = useState(false);
   const loadDetailEvent = async () => {
+    setLoading(true);
     try {
       const newEvent = await getDetailEvent(selectedSlot?.id);
       setEmailSelect(newEvent.data?.share_email || []);
@@ -45,6 +56,8 @@ function ModalCreateCalendar({
       setDetailEven(newEvent?.data);
     } catch (error) {
       handleErrorMessage(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -164,6 +177,7 @@ function ModalCreateCalendar({
     const accessToken = localStorage.getItem("accessToken");
     try {
       await deleteEvent({ eventId: selectedSlot?.id, accessToken });
+      notification.success({ message: "Xoá sự kiện thành công" });
     } catch (error) {
       handleErrorMessage(error);
     } finally {
@@ -176,6 +190,7 @@ function ModalCreateCalendar({
     const accessToken = localStorage.getItem("accessToken");
     try {
       await deleteRecurringEvent({ eventId: selectedSlot?.id, accessToken });
+      notification.success({ message: "Xoá sự kiện thành công" });
     } catch (error) {
       handleErrorMessage(error);
     } finally {
@@ -239,7 +254,6 @@ function ModalCreateCalendar({
     const attendee = selectedSlot.attendees?.find((a) => a.email === userEmail);
 
     const status = attendee?.response_status;
-    console.log(status);
 
     return (
       <div className="flex justify-between">
@@ -284,6 +298,12 @@ function ModalCreateCalendar({
         }}
       >
         <div className={styles.modalCreateCalendar}>
+          {loading && (
+            <div className="w-full h-full flex justify-center items-center absolute top-0 left-0 bg-white z-10">
+              <Spin />
+            </div>
+          )}
+
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -365,6 +385,15 @@ function ModalCreateCalendar({
               }
             />
           </div>
+          {selectedSlot?.status === "meeting" && (
+            <div>
+              google meet:{" "}
+              <a href={selectedSlot?.meet_link} target="_blank">
+                {selectedSlot?.meet_link}
+              </a>
+            </div>
+          )}
+
           <Input.TextArea
             placeholder="Nhập mô tả"
             value={description}
@@ -438,22 +467,26 @@ function ModalCreateCalendar({
             Bạn có muốn cập nhật tất cả chuỗi sự kiện này không?
           </p>
           <div className="modal-buttons flex justify-between">
-            <Button
-              onClick={() => {
-                onOk(
-                  title,
-                  description,
-                  frequency,
-                  mode,
-                  detailEvent?.frequency
-                );
-                setIsOpenModalUpdate(false);
-              }}
-              className="btn-cancel"
-              size="large"
-            >
-              Cập nhật sự kiện này
-            </Button>
+            {frequency === detailEvent?.frequency && (
+              <Button
+                onClick={() => {
+                  onOk(
+                    title,
+                    description,
+                    frequency,
+                    mode,
+                    [],
+                    detailEvent?.frequency
+                  );
+                  setIsOpenModalUpdate(false);
+                }}
+                className="btn-cancel"
+                size="large"
+              >
+                Cập nhật sự kiện này
+              </Button>
+            )}
+
             <Button
               onClick={() => {
                 onOk(title, description, frequency, mode, emailSelect);

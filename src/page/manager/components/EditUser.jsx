@@ -13,26 +13,30 @@ function EditUser({ isModalVisible, handleCancel, handleOk, id }) {
     handleCancel();
   };
 
-  const loadDetailUser = async() =>{
+  const loadDetailUser = async () => {
     try {
-        const user = await getUserDetail(id);
-        form.setFieldsValue(user?.data)
+      const user = await getUserDetail(id);
+      form.setFieldsValue({ email: user?.data.email });
     } catch (error) {
-        handleErrorMessage(error)
+      handleErrorMessage(error);
     }
-  }
+  };
 
-  useEffect(()=>{
-    if(id){
-        loadDetailUser()
+  useEffect(() => {
+    if (id) {
+      loadDetailUser();
     }
-  },[id])
+  }, [id]);
 
   const handleSubmit = async (payload) => {
+    if (!payload.email || !payload.password) {
+      notification.error({ message: "Vui lòng nhập đầy đủ thông tin" });
+    }
     try {
       await updateUser({
         id: id,
-        email: payload.email
+        email: payload.email,
+        password: payload.password,
       });
       notification.success({ message: "cập nhật người dùng thành công" });
       handleCancel();
@@ -42,7 +46,7 @@ function EditUser({ isModalVisible, handleCancel, handleOk, id }) {
       handleErrorMessage(error);
     }
   };
-  
+
   return (
     <Modal
       title="Cập nhật người dùng"
@@ -70,7 +74,13 @@ function EditUser({ isModalVisible, handleCancel, handleOk, id }) {
             <Input />
           </Form.Item>
         </div>
-       
+
+        <div className={styles.fromItem}>
+          <label>Mật khẩu mới</label>
+          <Form.Item name="password">
+            <Input type="password" />
+          </Form.Item>
+        </div>
       </Form>
     </Modal>
   );
