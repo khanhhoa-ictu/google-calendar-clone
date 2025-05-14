@@ -515,7 +515,7 @@ function ModalCreateCalendar({
             Bạn có muốn tham gia tất cả sự kiện trong chuỗi này không?
           </p>
           <div className="modal-buttons flex justify-between">
-            <Button
+            {/* <Button
               onClick={() => {
                 handleResponseEvent(statusResponse);
                 setIsOpenModalResponse(false);
@@ -524,7 +524,7 @@ function ModalCreateCalendar({
               size="large"
             >
               Chỉ sự kiện này
-            </Button>
+            </Button> */}
             <Button
               onClick={() => {
                 handleResponseEvent(statusResponse, true);
@@ -533,7 +533,7 @@ function ModalCreateCalendar({
               type="primary"
               size="large"
             >
-              Sụ kiện này và các sự kiện tiếp theo
+              Tất cả sự kiện
             </Button>
           </div>
         </div>

@@ -21,7 +21,8 @@ axiosInstance.interceptors.request.use(
 
 const logout = () => {
   Cookies.remove('token');
-  localStorage.clear()
+  localStorage.clear();
+  // window.location.href = '/login';
 };
 
 axiosInstance.interceptors.response.use(
