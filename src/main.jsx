@@ -5,9 +5,9 @@ import App from "./App.jsx";
 import { ProfileProvider } from "./context/ProfileContext";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode>
     <ProfileProvider>
       <App />
     </ProfileProvider>
-  </StrictMode>
+  // </StrictMode>
 );
