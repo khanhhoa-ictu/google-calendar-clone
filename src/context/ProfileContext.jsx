@@ -14,7 +14,7 @@ export const ProfileProvider = ({ children }) => {
       const response = await getProfile();
       setProfile(response);
     } catch (err) {
-      handleErrorMessage(err);
+      console.log(err)
     }
   };
 

@@ -104,7 +104,7 @@ function ModalCreateCalendar({
       handleChangeTime({
         ...selectedSlot,
         start_time: new Date(moment(date.toString())),
-        end_time: new Date(moment(date.toString()).endOf("day")),
+        end_time: new Date(moment(date.toString()).add(1,"days")),
       });
       return;
     }

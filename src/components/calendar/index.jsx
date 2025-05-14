@@ -91,14 +91,8 @@ function DnDResource({ profile }) {
       user_id: profile?.id,
       title: title,
       description: description,
-      start_time:
-        viewMode === "month"
-          ? moment(selectedSlot.start_time).format("YYYY-MM-DD")
-          : moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
-      end_time:
-        viewMode === "month"
-          ? moment(selectedSlot.end_time).add(1, "days").format("YYYY-MM-DD")
-          : moment(selectedSlot.end_time).format("YYYY-MM-DD HH:mm:ss"),
+      start_time:moment(selectedSlot.start_time).format("YYYY-MM-DD HH:mm:ss"),
+      end_time:moment(selectedSlot.end_time).format("YYYY-MM-DD HH:mm:ss"),
       frequency,
       emails: emailSelect,
       accessToken,
@@ -158,8 +152,8 @@ function DnDResource({ profile }) {
       const dataCalendar = await getListCalendar(profile?.id);
       const convertDataCalendar = dataCalendar?.data?.map((item) => ({
         ...item,
-        start_time: new Date(item.start_time),
-        end_time: new Date(item.end_time),
+        start_time: new Date(moment(item.start_time)),
+        end_time: new Date(moment(item.end_time)),
       }));
       setMyEventsList(convertDataCalendar);
     } catch (error) {
