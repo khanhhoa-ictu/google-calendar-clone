@@ -66,7 +66,7 @@ function CustomToolbar({
           setLoading(false);
         }, 2000);
       } else {
-        window.location.href = `http://localhost:8080/google/auth/${profile?.id}`;
+        window.location.href = `https://mycalendar.space/api/google/auth/${profile?.id}`;
       }
     } catch (error) {
       setLoading(false);

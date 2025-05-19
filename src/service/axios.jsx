@@ -13,7 +13,6 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    config.headers["ngrok-skip-browser-warning"] = "any";
     return config;
   },
   (error) => Promise.reject(error)
@@ -22,7 +21,6 @@ axiosInstance.interceptors.request.use(
 const logout = () => {
   Cookies.remove('token');
   localStorage.clear();
-  // window.location.href = '/login';
 };
 
 axiosInstance.interceptors.response.use(

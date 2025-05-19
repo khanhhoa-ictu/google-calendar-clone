@@ -1,7 +1,7 @@
 create database calendar;
 USE calendar;
 
-DROP TABLE user;
+
 CREATE TABLE user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -21,7 +21,6 @@ CREATE TABLE recurring_events (
     until DATETIME DEFAULT NULL 
 );
 
-DROP TABLE event;
 CREATE TABLE event (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -53,12 +52,10 @@ CREATE TABLE meeting_poll (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   description TEXT,
-  created_by INT NOT NULL,  -- user_id người tạo poll
-  finalized_event_id INT DEFAULT NULL, -- lưu ID sự kiện được chọn
+  created_by INT NOT NULL,  
+  finalized_event_id INT DEFAULT NULL, 
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-
-
 
 CREATE TABLE poll_options (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -79,6 +76,3 @@ CREATE TABLE poll_votes (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (option_id) REFERENCES poll_options(id)
 );
-
-describe user;
-SELECT * FROM user;
